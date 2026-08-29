@@ -1,15 +1,87 @@
 const axios = require('axios');
-const { SocksProxyAgent } = require('socks-proxy-agent');
+const crypto = require('crypto');
 const FormData = require('form-data');
-const { shz: bycf } = require('bycf');
 
-const TARGET_URL = 'https://voxlabs.ornzora.workers.dev';
-const TTS_ENDPOINT = `${TARGET_URL}/api/tts`;
-const SITEKEY = '0x4AAAAAADxGWHctWk2yfROX';
-const PROXY_API_URL = 'https://api.ikyyxd.my.id/v2l/proxy-free/ikyy-xsample';
-const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36";
+const listvoice_indo = {
+  'Gadis': '173',
+  'Ardi': '174',
+  'Siti': '404',
+  'Dimas': '405',
+  'Tuti': '488',
+  'Jajang': '489'
+};
 
-async function uploadToZFile(audioBuffer, filename = "vox-tts.mp3") {
+const listvoice_english = {
+  'Abbi': '540',
+  'Bella': '541',
+  'Hollie': '542',
+  'Maisie': '543',
+  'Mia': '544',
+  'Olivia': '545',
+  'Alfie': '546',
+  'Elliot': '547',
+  'Ethan': '548',
+  'Noah': '549'
+};
+
+const listvoice_turkish = {
+  'Meryem': '218',
+  'Ibrahim': '219'
+};
+
+const listvoice_japanese = {
+  'Aoi': '779',
+  'Daichi': '780',
+  'Mayu': '781',
+  'Naoki': '782',
+  'Shiori': '783',
+  'Nanami': '178',
+  'Keita': '179'
+};
+
+const listvoice_korean = {
+  'BongJin': '785',
+  'GookMin': '786',
+  'Hyunsu': '787',
+  'JiMin': '788',
+  'SeoHyeon': '789',
+  'SoonBok': '790',
+  'YuJin': '791',
+  'SunHi': '180',
+  'InJoon': '181'
+};
+
+const listvoice_multilingual = {
+  'Algenib': '817',
+  'Despina': '824',
+  'Enceladus': '825',
+  'Ava': '663',
+  'Marcello': '695',
+  'William': '713',
+  'Ash': '706',
+  'Sage': '709'
+};
+
+const voiceMap = {
+  ...listvoice_indo,
+  ...listvoice_english,
+  ...listvoice_turkish,
+  ...listvoice_japanese,
+  ...listvoice_korean,
+  ...listvoice_multilingual
+};
+
+Object.values(voiceMap).forEach(id => {
+  voiceMap[id] = id;
+});
+
+const list_model = Object.keys(voiceMap);
+
+function randomRevenuecatId() {
+  return 'rc_anon_' + crypto.randomBytes(8).toString('hex');
+}
+
+async function uploadToZFile(audioBuffer, filename = "voiser-tts.mp3") {
   const form = new FormData();
   form.append('file', audioBuffer, {
     filename: filename,
@@ -28,138 +100,94 @@ async function uploadToZFile(audioBuffer, filename = "vox-tts.mp3") {
   throw new Error(`Gagal upload ke zfile: ${JSON.stringify(res.data)}`);
 }
 
-class VoxTtsBot {
-  constructor() {
-    this.proxyList = [];
-    this.client = null;
+async function voiserTTS(text, model) {
+  const base_url = 'https://app-tts.voiser.ai';
+
+  if (!list_model.includes(model)) {
+    throw new Error(`Model '${model}' tidak valid. Pilih dari daftar yang tersedia.`);
   }
 
-  async loadProxies() {
-    try {
-      const res = await axios.get(PROXY_API_URL, { timeout: 10000 });
-      const rawList = Array.isArray(res.data) ? res.data : [];
+  const voiceId = voiceMap[model];
+  const revenuecatId = randomRevenuecatId();
 
-      this.proxyList = rawList.map(p => {
-        const parts = p.trim().split(':');
-        return parts.length === 4 ? {
-          host: parts[0], port: parseInt(parts[1]),
-          userId: parts[2], password: parts[3]
-        } : null;
-      }).filter(Boolean);
+  const registerRes = await axios.post(`${base_url}/members`, {
+    mac: null,
+    platform: "android",
+    revenuecatId: revenuecatId,
+    fcmToken: ""
+  }, {
+    headers: {
+      'User-Agent': 'Neo/1.0',
+      'Content-Type': 'application/json'
+    },
+    timeout: 15000
+  });
 
-      if (this.proxyList.length === 0) throw new Error('Proxy tidak tersedia');
-    } catch (err) {
-      throw new Error(`Gagal mengambil proxy: ${err.message}`);
-    }
+  const memberCode = registerRes.data?.memberCode;
+  if (!memberCode) throw new Error('Gagal mendaftar sesi di Voiser AI.');
+
+  const generateRes = await axios.post(`${base_url}/tts`, {
+    memberCode: memberCode,
+    text: text,
+    voiceId: voiceId,
+    pitch: "0",
+    speed: "1.0",
+    mood: "neutral",
+    instruction: "",
+    hasEmotionTag: false,
+    lang: "tr"
+  }, {
+    headers: {
+      'User-Agent': 'Dart/3.0 (dart:io)',
+      'Content-Type': 'application/json'
+    },
+    timeout: 20000
+  });
+
+  if (generateRes.data?.status !== "1" || !generateRes.data?.file) {
+    throw new Error('Gagal mendapatkan audio dari Voiser AI.');
   }
 
-  selectProxy(index = 0) {
-    if (!this.proxyList[index]) throw new Error('Index proxy di luar jangkauan');
+  const originAudioUrl = generateRes.data.file;
 
-    const activeProxy = this.proxyList[index];
-    const proxyUrl = `socks5://${activeProxy.userId}:${activeProxy.password}@${activeProxy.host}:${activeProxy.port}`;
-    const agent = new SocksProxyAgent(proxyUrl);
+  const audioStream = await axios.get(originAudioUrl, {
+    responseType: 'arraybuffer',
+    timeout: 20000
+  });
 
-    this.client = axios.create({
-      httpAgent: agent,
-      httpsAgent: agent,
-      timeout: 30000,
-      headers: {
-        'User-Agent': UA,
-        'Accept': '*/*',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'Accept-Language': 'id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7',
-        'Content-Type': 'application/json',
-        'Origin': TARGET_URL,
-        'Referer': `${TARGET_URL}/`
-      }
-    });
-  }
+  const audioBuffer = Buffer.from(audioStream.data);
 
-  async generateTts(text, voice, token) {
-    const payload = {
-      text: text,
-      lang: 0,
-      reverb: true,
-      turnstileToken: token,
-      voice: Number(voice) || 1
-    };
-
-    try {
-      const res = await this.client.post(TTS_ENDPOINT, payload, {
-        responseType: 'arraybuffer'
-      });
-
-      const contentType = res.headers['content-type'] || '';
-      if (contentType.includes('application/json')) {
-        const errorMsg = Buffer.from(res.data).toString();
-        throw new Error(`Server Error: ${errorMsg}`);
-      }
-
-      if (res.status === 200 && res.data.byteLength > 1000) {
-        return Buffer.from(res.data);
-      }
-
-      throw new Error('Respon audio tidak valid atau kosong');
-    } catch (err) {
-      if (err.response?.status === 403) throw new Error('TURNSTILE_BLOCKED');
-      if (err.response?.status === 400) throw new Error(`BAD_REQUEST: ${err.message}`);
-      throw err;
-    }
-  }
-
-  async processText(text, voice = 1, maxRetries = 3) {
-    await this.loadProxies();
-
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        this.selectProxy(attempt % this.proxyList.length);
-        const token = await bycf.turnstileMin(TTS_ENDPOINT, SITEKEY);
-        const audioBuffer = await this.generateTts(text, voice, token);
-
-        let audioUrl = null;
-        try {
-          audioUrl = await uploadToZFile(audioBuffer, `vox-${Date.now()}.mp3`);
-        } catch (e) {
-          audioUrl = null;
-        }
-
-        return {
-          buffer: audioBuffer,
-          url: audioUrl
-        };
-      } catch (err) {
-        if (err.message.includes('TURNSTILE_BLOCKED') && attempt < maxRetries - 1) {
-          continue;
-        }
-        if (attempt === maxRetries - 1) throw err;
-      }
-    }
-  }
+  return {
+    audioBuffer,
+    id: generateRes.data.id
+  };
 }
 
-const voiceOptions = Array.from({ length: 20 }, (_, i) => String(i + 1));
-
 module.exports = {
-  name: "Text To Speech",
-  desc: "Mengubah teks menjadi suara AI VoxLabs dengan pilihan tipe suara",
+  name: "Voiser Text To Speech",
+  desc: "Mengubah teks menjadi suara AI multi-bahasa menggunakan Voiser AI",
   category: "Tools",
-  path: "/api/tools/tts",
+  path: "/api/tools/voiser",
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true },
     text: { type: "string", required: true },
-    voice: {
+    model: {
       type: "select",
       required: false,
-      selection: voiceOptions,
-      value: "1"
+      selection: list_model,
+      value: "Gadis"
     }
   },
   async run(req, res, next) {
     try {
+      const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey;
       const text = req.query.text || req.body?.text;
-      const voice = req.query.voice || req.body?.voice || "1";
+      const model = req.query.model || req.body?.model || "Gadis";
+
+      if (!global.apikey.includes(apikey)) {
+        return res.status(403).json({ status: false, error: "Apikey invalid" });
+      }
 
       if (!text) {
         return res.status(400).json({
@@ -168,23 +196,31 @@ module.exports = {
         });
       }
 
-      const bot = new VoxTtsBot();
-      const result = await bot.processText(text, voice);
+      const { audioBuffer, id } = await voiserTTS(text, model);
 
-      if (result.url) {
+      let zfileUrl = null;
+      try {
+        zfileUrl = await uploadToZFile(audioBuffer, `voiser-${model}-${Date.now()}.mp3`);
+      } catch (e) {
+        zfileUrl = null;
+      }
+
+      if (zfileUrl) {
         return res.json({
           status: true,
           creator: "Melvin Rest Api",
           result: {
+            id: id,
             text: text,
-            voice: Number(voice),
-            url: result.url
+            model: model,
+            url: zfileUrl
           }
         });
       }
 
       res.setHeader("Content-Type", "audio/mpeg");
-      return res.send(result.buffer);
+      return res.send(audioBuffer);
+
     } catch (err) {
       next(err);
     }
