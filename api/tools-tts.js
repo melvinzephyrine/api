@@ -164,7 +164,7 @@ async function voiserTTS(text, model) {
 }
 
 module.exports = {
-  name: "Voiser Text To Speech",
+  name: "Text To Speech",
   desc: "Mengubah teks menjadi suara AI multi-bahasa menggunakan Voiser AI",
   category: "Tools",
   path: "/api/tools/voiser",
