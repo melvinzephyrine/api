@@ -29,10 +29,13 @@
 
         * { box-sizing: border-box; }
 
+        /* BACKGROUND GRID KOTAK-KOTAK KECIL */
         body {
             background-color: var(--nb-bg);
-            background-image: radial-gradient(#000000 1.2px, transparent 1.2px);
-            background-size: 20px 20px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
             color: var(--nb-text);
             font-family: 'Plus Jakarta Sans', sans-serif;
             overflow-x: hidden;
@@ -42,15 +45,13 @@
         .font-display { font-family: 'Space Grotesk', sans-serif; }
         .font-mono { font-family: 'Fira Code', monospace; }
 
-        /* BOOT SCREEN / SCREEN LOADING NEOBRUTALISM 3 DETIK */
+        /* BOOT SCREEN POLOS (TANPA PATTERN BINTIK / KOTAK) */
         #bootLoadingScreen {
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
-            background-color: var(--nb-bg);
-            background-image: radial-gradient(#000000 1.2px, transparent 1.2px);
-            background-size: 20px 20px;
+            background-color: var(--nb-bg); /* Latar polos tanpa background-image */
             z-index: 100000;
             display: flex;
             flex-direction: column;
@@ -325,7 +326,7 @@
             background-color: var(--nb-yellow);
         }
 
-        /* PERBAIKAN TOTAL TERHADAP BUG BORDER KATEGORI TERPOTONG ATAS */
+        /* SAFE PADDING UNTUK MEMPERBAIKI BORDER KATEGORI YANG TERPOTONG */
         .cat-pills-wrap {
             width: 100%;
             margin-bottom: 1rem;
@@ -334,7 +335,7 @@
             display: flex;
             gap: 0.65rem;
             overflow-x: auto;
-            padding-top: 10px;    /* PADDING ATAS UNTUK COLISEUM SHADOW & TRANSFORM */
+            padding-top: 10px;    /* PADDING ATAS AGAR TRANSFORM TOMBOL TIDAK TERPOTONG */
             padding-bottom: 12px; /* PADDING BAWAH UNTUK OFFSET BORDER */
             padding-left: 4px;
             padding-right: 4px;
@@ -439,7 +440,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* MODAL DONASI INTERAKTIF */
+        /* MODAL DONASI INTERAKTIF (QRIS ONLY) */
         .donasi-modal {
             position: fixed; inset: 0; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
@@ -473,71 +474,12 @@
         }
         .donasi-close-btn:hover { background: #f472b6; transform: translate(-1px, -1px); }
 
-        .donasi-tabs {
-            display: flex; gap: 0.4rem; margin-bottom: 1.25rem;
-            border: 2.5px solid var(--nb-border); border-radius: 14px; padding: 4px; background: var(--nb-bg);
-            box-shadow: 2px 2px 0px var(--nb-border);
-        }
-        .donasi-tab-btn {
-            flex: 1; padding: 0.55rem 0.5rem; border-radius: 10px; border: 2px solid transparent; background: transparent;
-            color: #000; font-weight: 800; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.4rem;
-            transition: all 0.15s ease;
-        }
-        .donasi-tab-btn.is-active { 
-            background: var(--nb-yellow); 
-            border-color: var(--nb-border); 
-            box-shadow: 2px 2px 0px var(--nb-border); 
-        }
-
         .donasi-qr-wrap {
             background: #fff; border-radius: 16px; padding: 0.75rem; margin-bottom: 1rem;
             display: flex; align-items: center; justify-content: center;
             border: 3px solid var(--nb-border); box-shadow: 4px 4px 0px var(--nb-border);
         }
         .donasi-qr-img { width: 100%; max-width: 220px; aspect-ratio: 1 / 1; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
-
-        .donasi-card-box {
-            border: 3px solid var(--nb-border);
-            border-radius: 16px;
-            padding: 1.2rem;
-            box-shadow: 4px 4px 0px var(--nb-border);
-            position: relative;
-            overflow: hidden;
-        }
-        .donasi-card-box.dana { background-color: #e0f2fe; }
-        .donasi-card-box.gopay { background-color: #dcfce7; }
-
-        .donasi-badge-name {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 3px 10px;
-            border: 2px solid var(--nb-border);
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            background: #ffffff;
-            box-shadow: 2px 2px 0px var(--nb-border);
-            margin-bottom: 8px;
-        }
-
-        .donasi-guide-box {
-            border: 2.5px solid var(--nb-border);
-            border-radius: 12px;
-            padding: 0.85rem;
-            background: #ffffff;
-            box-shadow: 3px 3px 0px var(--nb-border);
-        }
-
-        .donasi-copy-btn {
-            flex-shrink: 0; display: flex; align-items: center; gap: 0.35rem;
-            padding: 0.5rem 0.85rem; border-radius: 10px; border: 2px solid var(--nb-border); background: #ffffff;
-            color: #000; font-size: 0.75rem; font-weight: 800; cursor: pointer;
-            box-shadow: 2px 2px 0px var(--nb-border); transition: all 0.15s ease;
-        }
-        .donasi-copy-btn:hover { background: var(--nb-yellow); transform: translate(-1px, -1px); }
-        .donasi-copy-btn.copied { background: var(--nb-green); }
-        .donasi-panel.hidden { display: none; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -555,7 +497,7 @@
         </div>
     </div>
 
-    <!-- MODAL DONASI INTERAKTIF -->
+    <!-- MODAL DONASI INTERAKTIF (QRIS ONLY) -->
     <div id="donasiModal" class="donasi-modal" role="dialog" aria-modal="true" aria-labelledby="donasiTitle">
         <div class="donasi-modal-box">
             <button type="button" id="donasiCloseBtn" class="donasi-close-btn" aria-label="Tutup">
@@ -571,89 +513,14 @@
                 Donasi kamu sangat membantu biaya perawatan server agar Melvin Rest Api tetap cepat & selalu aktif.
             </p>
 
-            <div class="donasi-tabs">
-                <button type="button" class="donasi-tab-btn is-active" data-method="qris">
-                    <i class="fas fa-qrcode text-amber-600"></i> QRIS
-                </button>
-                <button type="button" class="donasi-tab-btn" data-method="dana">
-                    <i class="fas fa-wallet text-sky-600"></i> DANA
-                </button>
-                <button type="button" class="donasi-tab-btn" data-method="gopay">
-                    <i class="fas fa-mobile-screen-button text-emerald-600"></i> GoPay
-                </button>
+            <!-- PANEL QRIS ALL PAYMENT -->
+            <div class="donasi-qr-wrap">
+                <img src="https://d.top4top.io/p_3869t7t6m1.jpg" alt="QRIS All Payment" class="donasi-qr-img" id="donasiQr-id">
             </div>
-
-            <div class="donasi-panel" data-method-panel="qris">
-                <div class="donasi-qr-wrap">
-                    <img src="https://d.top4top.io/p_3869t7t6m1.jpg" alt="QRIS All Payment" class="donasi-qr-img" id="donasiQr-id">
-                </div>
-                <button type="button" class="nb-btn nb-btn-primary w-full py-2.5 text-xs font-extrabold donasi-download-btn"
-                        data-download-url="https://d.top4top.io/p_3869t7t6m1.jpg" data-download-name="QRIS-Melvin-Api.jpg">
-                    <i class="fas fa-download"></i> Simpan Gambar QRIS
-                </button>
-            </div>
-
-            <div class="donasi-panel hidden" data-method-panel="dana">
-                <div class="donasi-card-box dana mb-3">
-                    <div class="flex items-center justify-between mb-1">
-                        <div class="donasi-badge-name">
-                            <i class="fas fa-shield-halved text-sky-600"></i> A.n Rafka Ardiansyah
-                        </div>
-                        <span class="text-[10px] font-mono font-extrabold bg-sky-400 text-black border-2 border-black px-2 py-0.5 rounded-md shadow-[1.5px_1.5px_0px_#000]">DANA</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-2 mt-2">
-                        <div>
-                            <div class="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider font-mono">Nomor Akun</div>
-                            <div class="text-xl font-extrabold font-mono text-black">085167997251</div>
-                        </div>
-                        <button type="button" class="donasi-copy-btn" data-copy="085167997251">
-                            <i class="fas fa-copy"></i> Salin
-                        </button>
-                    </div>
-                </div>
-
-                <div class="donasi-guide-box">
-                    <div class="text-xs font-extrabold text-black mb-1.5 flex items-center gap-1.5">
-                        <i class="fas fa-circle-info text-sky-600"></i> Cara Transfer via DANA:
-                    </div>
-                    <ol class="text-[11px] font-bold text-gray-800 space-y-1 pl-4 list-decimal">
-                        <li>Buka aplikasi <strong>DANA</strong> lalu pilih <strong>Kirim / Send</strong>.</li>
-                        <li>Pilih <strong>Kirim ke Nomor HP</strong> dan masukkan nomor di atas.</li>
-                        <li>Pastikan nama penerima adalah <strong>Rafka Ardiansyah</strong>.</li>
-                    </ol>
-                </div>
-            </div>
-
-            <div class="donasi-panel hidden" data-method-panel="gopay">
-                <div class="donasi-card-box gopay mb-3">
-                    <div class="flex items-center justify-between mb-1">
-                        <div class="donasi-badge-name">
-                            <i class="fas fa-shield-halved text-emerald-600"></i> A.n Rafka Ardiansyah
-                        </div>
-                        <span class="text-[10px] font-mono font-extrabold bg-emerald-400 text-black border-2 border-black px-2 py-0.5 rounded-md shadow-[1.5px_1.5px_0px_#000]">GOPAY</span>
-                    </div>
-                    <div class="flex items-center justify-between gap-2 mt-2">
-                        <div>
-                            <div class="text-[10px] font-extrabold text-gray-700 uppercase tracking-wider font-mono">Nomor Akun</div>
-                            <div class="text-xl font-extrabold font-mono text-black">085167997251</div>
-                        </div>
-                        <button type="button" class="donasi-copy-btn" data-copy="085167997251">
-                            <i class="fas fa-copy"></i> Salin
-                        </button>
-                    </div>
-                </div>
-
-                <div class="donasi-guide-box">
-                    <div class="text-xs font-extrabold text-black mb-1.5 flex items-center gap-1.5">
-                        <i class="fas fa-circle-info text-emerald-600"></i> Cara Transfer via GoPay:
-                    </div>
-                    <ol class="text-[11px] font-bold text-gray-800 space-y-1 pl-4 list-decimal">
-                        <li>Buka aplikasi <strong>Gojek</strong> lalu pilih <strong>Bayar / Transfer</strong>.</li>
-                        <li>Masukkan nomor HP <strong>085167997251</strong> di kolom pencarian.</li>
-                        <li>Pastikan nama akun penerima adalah <strong>Rafka Ardiansyah</strong>.</li>
-                    </ol>
-                </div>
-            </div>
+            <button type="button" class="nb-btn nb-btn-primary w-full py-2.5 text-xs font-extrabold donasi-download-btn"
+                    data-download-url="https://d.top4top.io/p_3869t7t6m1.jpg" data-download-name="QRIS-Melvin-Api.jpg">
+                <i class="fas fa-download"></i> Simpan Gambar QRIS
+            </button>
         </div>
     </div>
 
@@ -839,14 +706,12 @@
             }, 50);
         })();
 
-        /* CONTROL MODAL DONASI INTERAKTIF */
+        /* CONTROL LOGIKA MODAL DONASI (QRIS ONLY) */
         (function () {
             const modal = document.getElementById('donasiModal');
             if (!modal) return;
             const closeBtn = document.getElementById('donasiCloseBtn');
             const openBtns = document.querySelectorAll('[data-donasi-open]');
-            const tabBtns = modal.querySelectorAll('.donasi-tab-btn');
-            const panels = modal.querySelectorAll('.donasi-panel');
 
             function openModal() {
                 modal.classList.add('show');
@@ -869,29 +734,6 @@
             document.addEventListener('keydown', function (e) {
                 if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
             });
-
-            tabBtns.forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const method = btn.getAttribute('data-method');
-                    tabBtns.forEach(function (b) { b.classList.toggle('is-active', b === btn); });
-                    panels.forEach(function (p) {
-                        p.classList.toggle('hidden', p.getAttribute('data-method-panel') !== method);
-                    });
-                });
-            });
-
-            function fallbackCopy(text, cb) {
-                const ta = document.createElement('textarea');
-                ta.value = text;
-                ta.style.position = 'fixed';
-                ta.style.opacity = '0';
-                document.body.appendChild(ta);
-                ta.focus();
-                ta.select();
-                try { document.execCommand('copy'); } catch (e) {}
-                document.body.removeChild(ta);
-                if (cb) cb();
-            }
 
             function downloadImage(url, filename, btn) {
                 const originalHTML = btn.innerHTML;
@@ -926,26 +768,6 @@
                     const url = btn.getAttribute('data-download-url');
                     const filename = btn.getAttribute('data-download-name') || 'qr.jpg';
                     downloadImage(url, filename, btn);
-                });
-            });
-
-            modal.querySelectorAll('.donasi-copy-btn').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const text = btn.getAttribute('data-copy');
-                    const original = btn.innerHTML;
-                    function done() {
-                        btn.innerHTML = '<i class="fas fa-check"></i> Disalin';
-                        btn.classList.add('copied');
-                        setTimeout(function () {
-                            btn.innerHTML = original;
-                            btn.classList.remove('copied');
-                        }, 1800);
-                    }
-                    if (navigator.clipboard && navigator.clipboard.writeText) {
-                        navigator.clipboard.writeText(text).then(done).catch(function () { fallbackCopy(text, done); });
-                    } else {
-                        fallbackCopy(text, done);
-                    }
                 });
             });
         })();
