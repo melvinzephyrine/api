@@ -12,7 +12,7 @@
     <title>Melvin Rest Api — API Reference</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800&family=Fira+Code:wght@500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800;900&family=Fira+Code:wght@500;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --nb-bg: #f8f6f0;
@@ -41,6 +41,85 @@
 
         .font-display { font-family: 'Space Grotesk', sans-serif; }
         .font-mono { font-family: 'Fira Code', monospace; }
+
+        /* BOOT SCREEN / SCREEN LOADING NEOBRUTALISM 3 DETIK */
+        #bootLoadingScreen {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--nb-bg);
+            background-image: radial-gradient(#000000 1.2px, transparent 1.2px);
+            background-size: 20px 20px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .boot-badge {
+            background-color: #ffffff;
+            border: 3.5px solid #000000;
+            border-radius: 16px;
+            padding: 0.6rem 1.2rem;
+            box-shadow: 4px 4px 0px #000000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .boot-api-pill {
+            background-color: var(--nb-green);
+            border: 2.5px solid #000000;
+            border-radius: 10px;
+            padding: 0.1rem 0.6rem;
+            font-size: 1.2rem;
+        }
+
+        .boot-progress-bar {
+            width: 260px;
+            height: 20px;
+            background: #ffffff;
+            border: 3.5px solid #000000;
+            border-radius: 12px;
+            padding: 2.5px;
+            box-shadow: 4px 4px 0px #000000;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .boot-progress-fill {
+            height: 100%;
+            background-color: var(--nb-yellow);
+            border-radius: 6px;
+            width: 0%;
+            animation: fillProgress3s 3s ease-in-out forwards;
+        }
+
+        @keyframes fillProgress3s {
+            0% { width: 0%; }
+            30% { width: 35%; }
+            70% { width: 75%; }
+            100% { width: 100%; }
+        }
+
+        .boot-status-pill {
+            background-color: var(--nb-green);
+            border: 2.5px solid #000000;
+            border-radius: 12px;
+            padding: 0.35rem 1rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 2.5px 2.5px 0px #000000;
+        }
 
         .brand-rest-pill {
             background-color: var(--nb-blue);
@@ -103,6 +182,177 @@
             background: var(--nb-yellow);
         }
 
+        .title-alby-style {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+        .title-alby-main {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            color: #000000;
+            line-height: 1;
+        }
+        .title-alby-pill {
+            display: inline-block;
+            background-color: var(--nb-green);
+            color: #000000;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 0.15rem 0.75rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 3px 3px 0px #000000;
+            text-transform: uppercase;
+        }
+
+        .stats-grid-row {
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 0.6rem;
+            width: 100%;
+            margin-top: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+        .stat-box-compact {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            box-shadow: 3px 3px 0px #000000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            transition: all 0.15s ease;
+        }
+        .stat-box-compact:hover {
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 4.5px 4.5px 0px #000000;
+        }
+
+        /* CUSTOM DROPDOWN SELECT METHOD */
+        .custom-dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+        .custom-dropdown-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #000000;
+            box-shadow: 3.5px 3.5px 0px #000000;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .custom-dropdown-btn:hover {
+            background-color: var(--nb-yellow);
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 5px 5px 0px #000000;
+        }
+        .custom-dropdown-list {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            width: 100%;
+            background-color: #ffffff;
+            border: 0px solid #000000;
+            border-radius: 12px;
+            margin-top: 0rem;
+            box-shadow: 0px 0px 0px #000000;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.25s ease-in-out, 
+                        margin-top 0.2s ease,
+                        border-width 0.15s ease,
+                        box-shadow 0.25s ease;
+        }
+        .custom-dropdown-container.is-open .custom-dropdown-list {
+            max-height: 320px;
+            opacity: 1;
+            margin-top: 0.5rem;
+            border-width: 3px;
+            box-shadow: 3.5px 3.5px 0px #000000;
+        }
+        .custom-dropdown-container.is-open .dropdown-chevron {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-option {
+            padding: 0.65rem 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #000000;
+            border-bottom: 2px solid #000000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s ease;
+        }
+
+        .custom-dropdown-container.is-open .custom-dropdown-option {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(1) { transition-delay: 0.05s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(2) { transition-delay: 0.09s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(3) { transition-delay: 0.13s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(4) { transition-delay: 0.17s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(5) { transition-delay: 0.21s; }
+
+        .custom-dropdown-option:last-child {
+            border-bottom: none;
+        }
+        .custom-dropdown-option:hover, .custom-dropdown-option.is-selected {
+            background-color: var(--nb-yellow);
+        }
+
+        .cat-pills-wrap {
+            transition: margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 2.5px solid var(--nb-border);
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.1rem;
+            white-space: nowrap;
+            cursor: pointer;
+            background: #ffffff;
+            color: #000;
+            transition: all 0.2s ease;
+            box-shadow: 2.5px 2.5px 0px var(--nb-border);
+        }
+        .cat-pill i {
+            font-size: 1.05rem;
+        }
+        .cat-pill.active, .cat-pill:hover {
+            background: var(--nb-yellow);
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 4px 4px 0px var(--nb-border);
+        }
+
         .method-badge {
             font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 800;
             padding: 0.25rem 0.65rem; border-radius: 8px; border: 2px solid var(--nb-border);
@@ -114,14 +364,33 @@
         .method-put { background-color: var(--nb-yellow); color: #000; }
         .method-delete { background-color: var(--nb-pink); color: #000; }
 
+        /* STYLING ROW ENDPOINT & ACCORDION SMOOTH DETAIL */
         .endpoint-row {
             border: 3px solid var(--nb-border); border-radius: 14px; background: #ffffff;
             box-shadow: 4px 4px 0px var(--nb-border);
-            transition: all 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            overflow: hidden;
         }
         .endpoint-row:hover {
             transform: translate(-2px, -2px);
             box-shadow: 6px 6px 0px var(--nb-border);
+        }
+
+        /* DETAIL PANEL ACCORDION SMOOTH SLIDE */
+        .ep-detail-wrap {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.25s ease-in-out,
+                        padding 0.25s ease;
+            border-top: 0px solid var(--nb-border);
+            background: var(--nb-bg);
+        }
+        .endpoint-row.is-open .ep-detail-wrap {
+            max-height: 500px;
+            opacity: 1;
+            border-top: 3px solid var(--nb-border);
         }
 
         .param-chip {
@@ -131,21 +400,6 @@
             box-shadow: 2px 2px 0px var(--nb-border);
         }
         .param-chip.required { background: var(--nb-pink); }
-
-        .cat-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            border: 2px solid var(--nb-border); border-radius: 999px; font-weight: 800; font-size: 0.85rem;
-            padding: 0.4rem 1.1rem; white-space: nowrap; cursor: pointer;
-            background: #ffffff; color: #000; transition: all 0.15s ease;
-            box-shadow: 2px 2px 0px var(--nb-border);
-        }
-        .cat-pill.active, .cat-pill:hover {
-            background: var(--nb-yellow);
-            transform: translate(-1px, -1px);
-            box-shadow: 4px 4px 0px var(--nb-border);
-        }
 
         .sidebar-link {
             display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; border-radius: 10px;
@@ -172,7 +426,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* STYLING MODAL DONASI BARU */
+        /* MODAL DONASI INTERAKTIF */
         .donasi-modal {
             position: fixed; inset: 0; z-index: 9999;
             display: flex; align-items: center; justify-content: center;
@@ -275,7 +529,20 @@
 </head>
 <body class="min-h-screen">
 
-    <!-- MODAL DONASI INTERAKTIF (QRIS, DANA, GOPAY) -->
+    <!-- BOOT / LOADING SCREEN NEOBRUTALISM (PAS 3 DETIK) -->
+    <div id="bootLoadingScreen">
+        <div class="boot-badge">
+            Melvin<span class="boot-api-pill">API</span>
+        </div>
+        <div class="boot-progress-bar">
+            <div class="boot-progress-fill"></div>
+        </div>
+        <div class="boot-status-pill" id="bootStatusText">
+            LOADING ENDPOINTS (0%)
+        </div>
+    </div>
+
+    <!-- MODAL DONASI INTERAKTIF -->
     <div id="donasiModal" class="donasi-modal" role="dialog" aria-modal="true" aria-labelledby="donasiTitle">
         <div class="donasi-modal-box">
             <button type="button" id="donasiCloseBtn" class="donasi-close-btn" aria-label="Tutup">
@@ -291,7 +558,6 @@
                 Donasi kamu sangat membantu biaya perawatan server agar Melvin Rest Api tetap cepat & selalu aktif.
             </p>
 
-            <!-- TABS METODE PEMBAYARAN -->
             <div class="donasi-tabs">
                 <button type="button" class="donasi-tab-btn is-active" data-method="qris">
                     <i class="fas fa-qrcode text-amber-600"></i> QRIS
@@ -304,7 +570,6 @@
                 </button>
             </div>
 
-            <!-- PANEL 1: QRIS -->
             <div class="donasi-panel" data-method-panel="qris">
                 <div class="donasi-qr-wrap">
                     <img src="https://d.top4top.io/p_3869t7t6m1.jpg" alt="QRIS All Payment" class="donasi-qr-img" id="donasiQr-id">
@@ -315,7 +580,6 @@
                 </button>
             </div>
 
-            <!-- PANEL 2: DANA -->
             <div class="donasi-panel hidden" data-method-panel="dana">
                 <div class="donasi-card-box dana mb-3">
                     <div class="flex items-center justify-between mb-1">
@@ -347,7 +611,6 @@
                 </div>
             </div>
 
-            <!-- PANEL 3: GOPAY -->
             <div class="donasi-panel hidden" data-method-panel="gopay">
                 <div class="donasi-card-box gopay mb-3">
                     <div class="flex items-center justify-between mb-1">
@@ -378,7 +641,6 @@
                     </ol>
                 </div>
             </div>
-
         </div>
     </div>
 
@@ -393,7 +655,6 @@
                 </div>
             </a>
             
-            <!-- Desktop Navbar -->
             <div class="hidden md:flex items-center gap-6">
                 <button type="button" data-donasi-open class="font-bold text-sm hover:underline flex items-center gap-1.5" style="background:none; border:none; cursor:pointer;">
                     <i class="fas fa-heart text-red-500"></i> Donasi
@@ -403,7 +664,6 @@
                 </a>
             </div>
 
-            <!-- Mobile Navbar -->
             <div class="md:hidden flex items-center gap-2">
                 <button type="button" data-donasi-open class="nb-btn nb-btn-yellow py-2 px-3 text-xs" aria-label="Donasi">
                     <i class="fas fa-heart text-red-500"></i>
@@ -417,29 +677,77 @@
 
     <!-- Content Container -->
     <div class="max-w-7xl mx-auto px-4 py-10">
-        <div class="mb-8">
-            <h1 class="font-display font-extrabold text-4xl sm:text-5xl mb-2">API Reference</h1>
-            <p class="font-semibold text-sm sm:text-base max-w-2xl text-gray-800">
-                Daftar lengkap endpoint Melvin Rest Api v1.0. Klik baris untuk melihat parameter dan contoh request.
-                Untuk pengujian langsung secara interaktif, kunjungi halaman <a href="/docs" class="font-extrabold underline decoration-2 decoration-black">Playground</a>.
+        <div class="mb-6">
+            <div class="title-alby-style">
+                <span class="title-alby-main">API</span>
+                <span class="title-alby-pill">REFERENCE</span>
+            </div>
+            <p class="font-bold text-sm sm:text-base text-gray-800 leading-relaxed max-w-3xl">
+                Dokumentasi resmi seluruh endpoint Melvin Rest Api. Cari endpoint, lihat struktur parameter, serta contoh request URL secara lengkap.
             </p>
+
+            <!-- STATS WIDGET SEJAJAR HORIZONTAL (KIRI & KANAN) -->
+            <div class="stats-grid-row">
+                <div class="stat-box-compact bg-[var(--nb-purple)]">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-layer-group text-black text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs uppercase font-mono tracking-wider">Total Categories</span>
+                    </div>
+                    <span id="quickCatCount" class="font-mono text-lg font-extrabold text-black">—</span>
+                </div>
+                <div class="stat-box-compact bg-[var(--nb-blue)]">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-cubes text-black text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs uppercase font-mono tracking-wider">Total Endpoints</span>
+                    </div>
+                    <span id="quickEpCount" class="font-mono text-lg font-extrabold text-black">—</span>
+                </div>
+            </div>
         </div>
 
-        <!-- Filter & Search Controls -->
-        <div class="mb-6 flex flex-col sm:flex-row gap-3">
-            <input id="searchInput" type="text" placeholder="Cari endpoint, path, kategori..."
-                   class="flex-1 border-3 border-black rounded-xl px-4 py-3 text-sm font-bold bg-white text-black shadow-[4px_4px_0px_#000] focus:outline-none">
-            <select id="methodFilter"
-                    class="border-3 border-black rounded-xl px-4 py-3 text-sm font-extrabold bg-white text-black shadow-[4px_4px_0px_#000] focus:outline-none">
-                <option value="">Semua Metode</option>
-                <option value="GET">GET</option>
-                <option value="POST">POST</option>
-                <option value="PUT">PUT</option>
-                <option value="DELETE">DELETE</option>
-            </select>
+        <!-- SEARCH INPUT DAN CUSTOM DROPDOWN NEUBRUTALISM STAGGERED SLIDE DOWN -->
+        <div class="space-y-3 mb-6">
+            <div class="relative w-full">
+                <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input id="searchInput" type="text" placeholder="Cari nama endpoint, path, kategori..."
+                       class="w-full border-3 border-black rounded-xl pl-11 pr-4 py-3 text-sm font-extrabold bg-white text-black shadow-[3.5px_3.5px_0px_#000] focus:outline-none transition-all">
+            </div>
+
+            <!-- DROPDOWN DENGAN ANIMASI TERSUSUN 1 PER 1 DARI ATAS KE BAWAH -->
+            <div class="custom-dropdown-container" id="customDropdown">
+                <button type="button" class="custom-dropdown-btn" id="dropdownToggleBtn">
+                    <span id="dropdownCurrentLabel">Semua Metode</span>
+                    <i class="fas fa-chevron-down dropdown-chevron transition-transform duration-200"></i>
+                </button>
+                <div class="custom-dropdown-list" id="dropdownOptionList">
+                    <div class="custom-dropdown-option is-selected" data-value="">
+                        <span>Semua Metode</span>
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="GET">
+                        <span>GET</span>
+                        <span class="method-badge method-get">GET</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="POST">
+                        <span>POST</span>
+                        <span class="method-badge method-post">POST</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="PUT">
+                        <span>PUT</span>
+                        <span class="method-badge method-put">PUT</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="DELETE">
+                        <span>DELETE</span>
+                        <span class="method-badge method-delete">DELETE</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div id="catPills" class="flex gap-2 overflow-x-auto pb-3 mb-6"></div>
+        <!-- KATEGORI PILLS DENGAN IKON BESAR -->
+        <div class="cat-pills-wrap">
+            <div id="catPills" class="flex gap-2.5 overflow-x-auto pb-3 mb-6"></div>
+        </div>
 
         <!-- Loading State -->
         <div id="loading" class="flex flex-col items-center justify-center py-20 gap-4">
@@ -453,11 +761,11 @@
                 <div class="sticky top-24 nb-card p-4">
                     <p class="text-xs font-extrabold uppercase tracking-wider mb-3 px-1">Kategori</p>
                     <nav id="sidebarNav" class="space-y-1 max-h-[65vh] overflow-y-auto pr-1"></nav>
-                    <div class="mt-6 p-3 border-2 border-black rounded-xl text-xs font-bold bg-[var(--nb-purple)] shadow-[2px_2px_0px_#000]">
+                    <div class="mt-6 p-3 border-2.5 border-black rounded-xl text-xs font-bold bg-[var(--nb-purple)] shadow-[2.5px_2.5px_0px_#000]">
                         <p class="font-extrabold mb-1">Base URL</p>
-                        <code id="baseUrl" class="font-mono text-[11px] break-all bg-white px-2 py-1 rounded border border-black block mb-2"></code>
+                        <code id="baseUrl" class="font-mono text-[11px] break-all bg-white px-2 py-1 rounded border border-black block mb-2 font-extrabold"></code>
                         <p class="font-extrabold mb-1">Apikey Demo</p>
-                        <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black">mlvn</code> / <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black">1</code>
+                        <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black font-extrabold">mlvn</code> / <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black font-extrabold">1</code>
                     </div>
                 </div>
             </aside>
@@ -487,6 +795,37 @@
     </footer>
 
     <script>
+        /* CONTROL BOOT SCREEN LOADING PAS 3 DETIK (3000ms) */
+        (function () {
+            const bootScreen = document.getElementById('bootLoadingScreen');
+            const bootText = document.getElementById('bootStatusText');
+            let start = Date.now();
+            let duration = 3000;
+
+            let interval = setInterval(() => {
+                let elapsed = Date.now() - start;
+                let progress = Math.min(Math.floor((elapsed / duration) * 100), 100);
+                if (bootText) {
+                    if (progress < 40) {
+                        bootText.textContent = `INITIALIZING DATA (${progress}%)`;
+                    } else if (progress < 85) {
+                        bootText.textContent = `BUILDING ENDPOINTS (${progress}%)`;
+                    } else {
+                        bootText.textContent = `READY (${progress}%)`;
+                    }
+                }
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if (bootScreen) {
+                            bootScreen.style.opacity = '0';
+                            bootScreen.style.visibility = 'hidden';
+                        }
+                    }, 100);
+                }
+            }, 50);
+        })();
+
         /* CONTROL MODAL DONASI INTERAKTIF */
         (function () {
             const modal = document.getElementById('donasiModal');
@@ -518,7 +857,6 @@
                 if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
             });
 
-            /* SWITCH TAB METODE PAYMENT (QRIS / DANA / GOPAY) */
             tabBtns.forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     const method = btn.getAttribute('data-method');
@@ -599,6 +937,37 @@
             });
         })();
 
+        /* CONTROL LOGIKA DROPDOWN SLIDE DOWN & TOGGLE */
+        let selectedMethodFilter = "";
+        const dropdownContainer = document.getElementById('customDropdown');
+        const dropdownToggleBtn = document.getElementById('dropdownToggleBtn');
+        const dropdownCurrentLabel = document.getElementById('dropdownCurrentLabel');
+        const dropdownOptions = document.querySelectorAll('.custom-dropdown-option');
+
+        dropdownToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownContainer.classList.toggle('is-open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!dropdownContainer.contains(e.target)) {
+                dropdownContainer.classList.remove('is-open');
+            }
+        });
+
+        dropdownOptions.forEach(function (option) {
+            option.addEventListener('click', function () {
+                selectedMethodFilter = option.getAttribute('data-value');
+                dropdownCurrentLabel.textContent = option.children[0].textContent;
+                
+                dropdownOptions.forEach(o => o.classList.remove('is-selected'));
+                option.classList.add('is-selected');
+
+                dropdownContainer.classList.remove('is-open');
+                renderList();
+            });
+        });
+
         let allCategories = [];
         let activeCategory = 'all';
         const base = window.location.origin;
@@ -669,6 +1038,14 @@
                 allCategories = fallbackData;
             }
 
+            const totalCats = allCategories.length;
+            const totalEps = allCategories.reduce((acc, cat) => acc + (cat.items ? cat.items.length : 0), 0);
+            
+            const quickCatEl = document.getElementById('quickCatCount');
+            const quickEpEl = document.getElementById('quickEpCount');
+            if (quickCatEl) quickCatEl.textContent = totalCats;
+            if (quickEpEl) quickEpEl.textContent = totalEps;
+
             renderPills();
             renderSidebar();
             renderList();
@@ -712,7 +1089,7 @@
 
         function getFiltered() {
             const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
-            const method = document.getElementById('methodFilter').value;
+            const method = selectedMethodFilter;
             return allCategories.map(cat => {
                 if (activeCategory !== 'all' && cat.name !== activeCategory) return null;
                 let items = cat.items;
@@ -771,17 +1148,19 @@
                                 <div class="font-extrabold text-sm sm:text-base text-black truncate">${escapeHtml(item.name || 'Unnamed')}</div>
                                 <div class="font-mono text-[11px] sm:text-xs text-gray-700 font-bold truncate mt-0.5">${escapeHtml(item.path || '')}</div>
                             </div>
-                            <i class="fas fa-chevron-down text-sm mt-2 text-black chevron transition-transform"></i>
+                            <i class="fas fa-chevron-down text-sm mt-2 text-black chevron transition-transform duration-300"></i>
                         </button>
-                        <div class="ep-detail hidden px-4 pb-4 border-t-3 border-black pt-3 bg-[var(--nb-bg)] rounded-b-xl">
-                            <p class="text-sm text-gray-900 font-semibold mb-3">${escapeHtml(item.description || 'Tidak ada deskripsi')}</p>
-                            <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Parameter</p>
-                            <div class="flex flex-wrap gap-1.5 mb-4">${paramHtml}</div>
-                            <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Contoh Request URL</p>
-                            <code class="block font-mono text-[11px] sm:text-xs bg-white text-black p-3 rounded-xl overflow-x-auto break-all border-2 border-black shadow-[2px_2px_0px_#000] font-bold">${escapeHtml(exampleUrl)}</code>
-                            <a href="/docs?focus=${encodeURIComponent(item.path || '')}" class="inline-flex mt-3 nb-btn nb-btn-primary px-3.5 py-1.5 text-xs font-extrabold">
-                                <i class="fas fa-play mr-1"></i> Uji di Playground
-                            </a>
+                        <div class="ep-detail-wrap">
+                            <div class="p-4 border-t-3 border-black bg-[var(--nb-bg)] rounded-b-xl">
+                                <p class="text-sm text-gray-900 font-semibold mb-3">${escapeHtml(item.description || 'Tidak ada deskripsi')}</p>
+                                <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Parameter</p>
+                                <div class="flex flex-wrap gap-1.5 mb-4">${paramHtml}</div>
+                                <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Contoh Request URL</p>
+                                <code class="block font-mono text-[11px] sm:text-xs bg-white text-black p-3 rounded-xl overflow-x-auto break-all border-2 border-black shadow-[2px_2px_0px_#000] font-bold">${escapeHtml(exampleUrl)}</code>
+                                <a href="/docs?focus=${encodeURIComponent(item.path || '')}" class="inline-flex mt-3 nb-btn nb-btn-primary px-3.5 py-1.5 text-xs font-extrabold">
+                                    <i class="fas fa-play mr-1"></i> Uji di Playground
+                                </a>
+                            </div>
                         </div>
                     </div>`;
                 }).join('');
@@ -789,7 +1168,7 @@
                 return `
                 <section id="cat-${slug(cat.name)}" class="scroll-mt-24 mb-8">
                     <h2 class="font-display font-extrabold text-xl mb-4 flex items-center gap-2">
-                        <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-[var(--nb-yellow)] border-2 border-black text-sm text-black">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[var(--nb-yellow)] border-2.5 border-black text-base text-black shadow-[2px_2px_0px_#000]">
                             <i class="${getCategoryIcon(cat.name)}"></i>
                         </span>
                         ${escapeHtml(cat.name)}
@@ -803,11 +1182,10 @@
                 btn.addEventListener('click', () => {
                     const row = document.getElementById(btn.dataset.target);
                     if (!row) return;
-                    const detail = row.querySelector('.ep-detail');
                     const chev = row.querySelector('.chevron');
-                    const open = !detail.classList.contains('hidden');
-                    detail.classList.toggle('hidden', open);
-                    row.classList.toggle('open', !open);
+                    const open = row.classList.contains('is-open');
+                    
+                    row.classList.toggle('is-open', !open);
                     if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
                 });
             });
@@ -826,7 +1204,6 @@
         }
 
         document.getElementById('searchInput').addEventListener('input', renderList);
-        document.getElementById('methodFilter').addEventListener('change', renderList);
 
         document.addEventListener('DOMContentLoaded', loadData);
     </script>
