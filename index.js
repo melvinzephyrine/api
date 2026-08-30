@@ -93,7 +93,7 @@ const settings = {
   linkWhatsapp: "https://whatsapp.com/channel/0029Vb7eLDIGzzKXAALjIO1v"
 };
 
-global.apikey = ["mlvn", "1"];
+global.apikey = ["vinn", "1"];
 
 app.use((req, res, next) => {
   const originalJson = res.json;
