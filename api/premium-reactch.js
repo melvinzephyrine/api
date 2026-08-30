@@ -48,7 +48,7 @@ module.exports = [
     name: "React Channel WhatsApp",
     desc: "Mengirimkan reaksi emoji ke postingan/pesan di Saluran WhatsApp (WhatsApp Channel)",
     category: "Premium",
-    method: "POST",
+    method: "GET",
     path: "/api/prem/reactch",
     parameters: {
       apikey: {

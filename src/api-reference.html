@@ -325,8 +325,20 @@
             background-color: var(--nb-yellow);
         }
 
+        /* PERBAIKAN TOTAL TERHADAP BUG BORDER KATEGORI TERPOTONG ATAS */
         .cat-pills-wrap {
-            transition: margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        #catPills {
+            display: flex;
+            gap: 0.65rem;
+            overflow-x: auto;
+            padding-top: 10px;    /* PADDING ATAS UNTUK COLISEUM SHADOW & TRANSFORM */
+            padding-bottom: 12px; /* PADDING BAWAH UNTUK OFFSET BORDER */
+            padding-left: 4px;
+            padding-right: 4px;
+            margin-top: -6px;
         }
         .cat-pill {
             display: inline-flex;
@@ -341,8 +353,9 @@
             cursor: pointer;
             background: #ffffff;
             color: #000;
-            transition: all 0.2s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
             box-shadow: 2.5px 2.5px 0px var(--nb-border);
+            flex-shrink: 0;
         }
         .cat-pill i {
             font-size: 1.05rem;
@@ -364,7 +377,7 @@
         .method-put { background-color: var(--nb-yellow); color: #000; }
         .method-delete { background-color: var(--nb-pink); color: #000; }
 
-        /* STYLING ROW ENDPOINT & ACCORDION SMOOTH DETAIL */
+        /* STYLING ROW ENDPOINT & ACCORDION DETAIL */
         .endpoint-row {
             border: 3px solid var(--nb-border); border-radius: 14px; background: #ffffff;
             box-shadow: 4px 4px 0px var(--nb-border);
@@ -744,9 +757,9 @@
             </div>
         </div>
 
-        <!-- KATEGORI PILLS DENGAN IKON BESAR -->
+        <!-- KATEGORI PILLS TERPROTEKSI TERHADAP BORDER TERPOTONG -->
         <div class="cat-pills-wrap">
-            <div id="catPills" class="flex gap-2.5 overflow-x-auto pb-3 mb-6"></div>
+            <div id="catPills"></div>
         </div>
 
         <!-- Loading State -->

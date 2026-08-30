@@ -61,7 +61,7 @@ module.exports = [
     name: "React Channel WhatsApp V2",
     desc: "Mengirimkan reaksi emoji ke Saluran WhatsApp menggunakan server V2",
     category: "Premium",
-    method: "POST",
+    method: "GET",
     path: "/api/prem/reactchv2",
     parameters: {
       apikey: {
