@@ -69,7 +69,7 @@ module.exports = [
     method: "GET",
     parameters: {
       apikey: { type: "string", required: true },
-      message: { type: "string", required: true, example: "Hello, Welcome to Melvin Rest Api" },
+      message: { type: "string", required: true },
       sender: { type: "select", required: false, selection: ["self", "other"], value: "other" },
       carrier: { type: "string", required: false, example: "INDOSAT" },
       time: { type: "string", required: false, example: "21:02" },

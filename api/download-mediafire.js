@@ -62,8 +62,7 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       url: { 
         type: "string", 

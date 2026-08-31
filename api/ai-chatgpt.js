@@ -199,20 +199,18 @@ async function processChatGPT(userPrompt, inputChatId = null) {
 
 module.exports = [
   {
-    name: "ChatGPT",
+    name: "Chat GPT",
     desc: "Asisten AI cerdas berbasis model ChatGPT",
     category: "AI",
     method: "GET",
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       prompt: { 
         type: "string", 
-        required: true, 
-        example: "halo" 
+        required: true
       },
       chatId: { 
         type: "string", 

@@ -177,18 +177,15 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       prompt: { 
         type: "string", 
-        required: true, 
-        example: "halo" 
+        required: true
       },
       chatId: { 
         type: "string", 
-        required: false, 
-        example: "" 
+        required: false
       }
     },
     path: "/api/ai/qwen",

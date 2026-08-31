@@ -68,13 +68,11 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       package: { 
         type: "string", 
-        required: true, 
-        example: "express" 
+        required: true
       }
     },
     path: "/api/download/npmdl",

@@ -1,24 +1,20 @@
 const axios = require('axios');
 
-const AION_API_KEY = "sk-aion-f1ad0d799f876006e48e393261a291493c8debff5b969ba016a8232775e7816a";
+const ORCAROUTER_API_KEY = "sk-orca-kmIHoi0WUg77mzOLm4yoNAFI4qgqRhzdOFIbZmxNGcZ";
 
-async function askDeepSeek(prompt, systemPrompt = "") {
-  const messages = [];
-  if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
-  messages.push({ role: "user", content: prompt });
-
+async function askDeepSeek(prompt) {
   const { data } = await axios.post(
-    "https://aion.mehho.my.id/v1/chat/completions",
+    "https://api.orcarouter.ai/v1/chat/completions",
     {
-      model: "aion/deepseek-v4-pro",
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 2000
+      model: "deepseek/deepseek-v4-flash-free",
+      messages: [{ role: "user", content: prompt }],
+      stream: false
     },
     {
       headers: {
-        "Authorization": `Bearer ${AION_API_KEY}`,
-        "Content-Type": "application/json"
+        "Authorization": `Bearer ${ORCAROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
       },
       timeout: 60000
     }
@@ -32,22 +28,20 @@ async function askDeepSeek(prompt, systemPrompt = "") {
 
 module.exports = {
   name: "DeepSeek AI",
-  desc: "Model AI canggih DeepSeek V4 Pro untuk penalaran kompleks dan pembuatan kode",
+  desc: "Asisten AI cerdas berbasis model DeepSeek V4 Flash Free",
   category: "AI",
   path: "/api/ai/deepseek",
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true },
-    text: { type: "string", required: true },
-    system: { type: "string", required: false }
+    text: { type: "string", required: true }
   },
   async run(req, res, next) {
     try {
       const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey;
       const text = req.query.text || req.body?.text;
-      const systemPrompt = req.query.system || req.body?.system || "";
 
-      if (!global.apikey.includes(apikey)) {
+      if (!global.apikey || !global.apikey.includes(apikey)) {
         return res.status(403).json({ status: false, error: "Apikey invalid" });
       }
 
@@ -55,17 +49,21 @@ module.exports = {
         return res.status(400).json({ status: false, error: "Parameter 'text' wajib diisi!" });
       }
 
-      const responseText = await askDeepSeek(text, systemPrompt);
+      const responseText = await askDeepSeek(text);
 
       return res.json({
         status: true,
         result: {
-          model: "DeepSeek-V4-Pro",
+          model: "deepseek-v4-flash-free",
           response: responseText
         }
       });
     } catch (err) {
-      next(err);
+      const errorMsg = err.response?.data?.error?.message || err.message || "Terjadi kesalahan pada server AI";
+      return res.status(500).json({
+        status: false,
+        error: errorMsg
+      });
     }
   }
 };

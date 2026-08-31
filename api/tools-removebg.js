@@ -164,13 +164,11 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       url: { 
         type: "string", 
-        required: true, 
-        example: "https://example.jpg" 
+        required: true
       }
     },
     path: "/api/tools/removebg",

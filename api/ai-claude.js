@@ -1,33 +1,17 @@
 const axios = require('axios');
 
-const AION_API_KEY = "sk-aion-f1ad0d799f876006e48e393261a291493c8debff5b969ba016a8232775e7816a";
+const GOROUTER_API_KEY = "sk-BLcmIhrecBDjH9VtxgwAQG8Wvrww3kLnz451WLWZITEaiXkb";
 
-const modelMap = {
-  'Claude-Fable-5': 'aion/claude-fable-5',
-  'Claude-Opus-5': 'aion/claude-opus-5',
-  'Claude-Sonnet-5': 'aion/claude-sonnet-5'
-};
-
-const list_model = Object.keys(modelMap);
-
-async function askClaude(prompt, modelChoice, systemPrompt = "") {
-  const selectedModel = modelMap[modelChoice] || 'aion/claude-fable-5';
-
-  const messages = [];
-  if (systemPrompt) messages.push({ role: "system", content: systemPrompt });
-  messages.push({ role: "user", content: prompt });
-
+async function askClaude(prompt) {
   const { data } = await axios.post(
-    "https://aion.mehho.my.id/v1/chat/completions",
+    "https://gorouter.app/v1/chat/completions",
     {
-      model: selectedModel,
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 2000
+      model: "claude-opus-5-thinking",
+      messages: [{ role: "user", content: prompt }]
     },
     {
       headers: {
-        "Authorization": `Bearer ${AION_API_KEY}`,
+        "Authorization": `Bearer ${GOROUTER_API_KEY}`,
         "Content-Type": "application/json"
       },
       timeout: 60000
@@ -42,29 +26,20 @@ async function askClaude(prompt, modelChoice, systemPrompt = "") {
 
 module.exports = {
   name: "Claude AI",
-  desc: "Asisten AI cerdas berbasis Claude dengan pilihan model",
+  desc: "Asisten AI cerdas berbasis model Claude Opus 5 Thinking",
   category: "AI",
   path: "/api/ai/claude",
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true },
-    text: { type: "string", required: true },
-    model: {
-      type: "select",
-      required: false,
-      selection: list_model,
-      value: "Claude-Fable-5"
-    },
-    system: { type: "string", required: false }
+    text: { type: "string", required: true }
   },
   async run(req, res, next) {
     try {
       const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey;
       const text = req.query.text || req.body?.text;
-      const modelChoice = req.query.model || req.body?.model || "Claude-Fable-5";
-      const systemPrompt = req.query.system || req.body?.system || "";
 
-      if (!global.apikey.includes(apikey)) {
+      if (!global.apikey || !global.apikey.includes(apikey)) {
         return res.status(403).json({ status: false, error: "Apikey invalid" });
       }
 
@@ -72,17 +47,21 @@ module.exports = {
         return res.status(400).json({ status: false, error: "Parameter 'text' wajib diisi!" });
       }
 
-      const responseText = await askClaude(text, modelChoice, systemPrompt);
+      const responseText = await askClaude(text);
 
       return res.json({
         status: true,
         result: {
-          model: modelChoice,
+          model: "claude-opus-5-thinking",
           response: responseText
         }
       });
     } catch (err) {
-      next(err);
+      const errorMsg = err.response?.data?.error?.message || err.message || "Terjadi kesalahan pada server AI";
+      return res.status(500).json({
+        status: false,
+        error: errorMsg
+      });
     }
   }
 };

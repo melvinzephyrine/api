@@ -147,13 +147,11 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       url: { 
         type: "string", 
-        required: true, 
-        example: "https://youtu.be/W5_JxKjetVg" 
+        required: true
       },
       kbps: { 
         type: "select", 

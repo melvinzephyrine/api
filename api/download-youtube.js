@@ -110,13 +110,11 @@ module.exports = [
     parameters: {
       apikey: { 
         type: "string", 
-        required: true, 
-        example: "mlvn" 
+        required: true
       },
       url: { 
         type: "string", 
-        required: true, 
-        example: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" 
+        required: true
       },
       format: {
         type: "select",

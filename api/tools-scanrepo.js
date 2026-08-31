@@ -103,7 +103,7 @@ module.exports = {
   path: "/api/tools/scanrepo",
   method: "GET",
   parameters: {
-    apikey: { type: "string", required: true, example: "mlvn" },
+    apikey: { type: "string", required: true },
     url: { type: "string", required: true, example: "https://github.com/user/repo" }
   },
   run: async (req, res) => {
