@@ -1,11 +1,9 @@
 const axios = require('axios');
 const crypto = require('crypto');
 
-const cooldowns = new Map();
-
 class AlightMotionAuth {
     constructor() {
-        this.ORDER_ID = "melvin";
+        this.ORDER_ID = "vinn";
         this.API_KEY = "AIzaSyDtG1AU22ErnQD60AzBAcaknySiz9_CEq0";
         this.PRODUCT_ID = "am.full.sub.annual.19q4";
         this.TOKEN = "mmgaobamlahbbeccfplmbkbb.AO-J1OzqG0or_GJJIx-ms8GrTm-jaglCRfhQSRPUZKpl2YspYS-oN7_94uv8RC5vQbvd_Ios2pPDStZ2n7F0hLE3FiOU7HS3R6Fquulv5xLXFECSv4ctElw";
@@ -57,7 +55,7 @@ class AlightMotionAuth {
     async verifyAndFetchProfile(email, rawLink) {
         try {
             const oobCode = this.extractOobCode(rawLink);
-            if (!oobCode) throw new Error("Gagal mengekstrak oobCode.");
+            if (!oobCode) throw new Error("Gagal mengekstrak oobCode dari link.");
             const signinRes = await axios.post(`https://www.googleapis.com/identitytoolkit/v3/relyingparty/emailLinkSignin?key=${this.API_KEY}`, {
                 email: email,
                 oobCode: oobCode,
@@ -99,97 +97,66 @@ class AlightMotionAuth {
     }
 }
 
-function getClientIP(req) {
-    return req.headers['x-forwarded-for']?.split(',')[0]?.trim() || 
-           req.headers['x-real-ip'] || 
-           req.connection?.remoteAddress || 
-           req.socket?.remoteAddress || 
-           req.ip;
-}
+const amAuth = new AlightMotionAuth();
 
 module.exports = {
-  name: "Verify Magic Link",
-  desc: "Verifikasi magic link untuk aktivasi premium Alight Motion",
+  name: "Alight Motion Verify",
+  desc: "Verifikasi Magic Link email dan otomatis mengaktifkan Alight Motion Premium",
   category: "Premium",
-  parameters: {
-    apikey: { type: "string" },
-    email: { type: "string" },
-    link: { type: "string" }
-  },
   path: "/api/prem/am-verify",
-  async run(req, res) {
-    const { apikey, email, link } = req.query;
-
-    if (!apikey || !global.apikey.includes(apikey)) {
-      return res.json({ status: false, error: "Apikey invalid" });
-    }
-
-    if (!email || !link) {
-      return res.json({ status: false, error: "Email dan link wajib diisi" });
-    }
-
-    const clientIP = getClientIP(req);
-    const cooldownKey = `verify_${clientIP}`;
-    const now = Date.now();
-    const cooldownTime = 5 * 60 * 1000; // 5 menit
-
-    if (cooldowns.has(cooldownKey)) {
-      const lastRequest = cooldowns.get(cooldownKey);
-      if (now - lastRequest < cooldownTime) {
-        const remaining = Math.ceil((cooldownTime - (now - lastRequest)) / 1000);
-        const minutes = Math.floor(remaining / 60);
-        const seconds = remaining % 60;
-        return res.status(429).json({
-          status: false,
-          error: `⏳ Cooldown: ${minutes} menit ${seconds} detik lagi`,
-          cooldown: {
-            remaining: remaining,
-            minutes: minutes,
-            seconds: seconds
-          }
-        });
-      }
-    }
-
-    cooldowns.set(cooldownKey, now);
-    setTimeout(() => cooldowns.delete(cooldownKey), cooldownTime);
-
+  method: "GET",
+  parameters: {
+    apikey: { type: "string", required: true },
+    email: { type: "string", required: true },
+    link: { type: "string", required: true }
+  },
+  async run(req, res, next) {
     try {
-      const auth = new AlightMotionAuth();
-      
-      const verifyResult = await auth.verifyAndFetchProfile(email.trim(), link.trim());
-      if (!verifyResult.success) {
+      const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey;
+      const email = req.query.email || req.body?.email;
+      const link = req.query.link || req.body?.link;
+
+      if (!global.apikey || !global.apikey.includes(apikey)) {
+        return res.status(403).json({ status: false, error: "Apikey invalid" });
+      }
+
+      if (!email) {
+        return res.status(400).json({ status: false, error: "Parameter 'email' wajib diisi!" });
+      }
+
+      if (!link) {
+        return res.status(400).json({ status: false, error: "Parameter 'link' wajib diisi!" });
+      }
+
+      const verifyRes = await amAuth.verifyAndFetchProfile(email, link);
+      if (!verifyRes.success) {
         return res.status(400).json({
           status: false,
-          error: verifyResult.error || "Verifikasi gagal"
+          error: "Gagal memverifikasi link: " + verifyRes.error
         });
       }
 
-      const premiumResult = await auth.applyPremium(verifyResult.idToken);
-      if (!premiumResult.success) {
+      const premiumRes = await amAuth.applyPremium(verifyRes.idToken);
+      if (!premiumRes.success) {
         return res.status(500).json({
           status: false,
-          creator: "t.me/luyatiem",
-          error: premiumResult.error || "Gagal aktivasi premium"
+          error: "Gagal mengaplikasikan lisensi premium: " + premiumRes.error
         });
       }
 
       return res.json({
         status: true,
-        creator: "t.me/luyatiem",
-        message: "✅ Premium berhasil diaktifkan!",
-        data: {
-          email: email.trim(),
-          orderId: premiumResult.codeorder
+        message: `Verifikasi berhasil! Sesi Alight Motion Premium untuk akun ${email} telah aktif.`,
+        result: {
+          email: email,
+          user: verifyRes.user,
+          premium: premiumRes.data,
+          codeorder: premiumRes.codeorder
         }
       });
 
     } catch (err) {
-      return res.status(500).json({
-        status: false,
-        creator: "t.me/luyatiem",
-        error: err.message || "Terjadi kesalahan internal"
-      });
+      next(err);
     }
   }
 };

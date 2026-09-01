@@ -93,7 +93,7 @@ const settings = {
   linkWhatsapp: "https://whatsapp.com/channel/0029Vb7eLDIGzzKXAALjIO1v"
 };
 
-global.apikey = ["vinn", "1"];
+global.apikey = ["vinn"];
 
 app.use((req, res, next) => {
   const originalJson = res.json;
@@ -102,7 +102,7 @@ app.use((req, res, next) => {
       const { status, ...rest } = data;
       const responseData = {
         status: status,
-        creator: "t.me/luyatiem",
+        creator: "@viñn so fine.",
         ...rest
       };
       return originalJson.call(this, responseData);

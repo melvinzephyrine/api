@@ -32,7 +32,6 @@
 
         * { box-sizing: border-box; }
 
-        /* BACKGROUND GRID KOTAK-KOTAK KECIL UNTUK HALAMAN DOCS */
         body {
             background-color: var(--nb-bg);
             background-image: 
@@ -71,7 +70,7 @@
             font-weight: 800;
             padding: 0.6rem 1.2rem;
             box-shadow: 3px 3px 0px var(--nb-border);
-            transition: all 0.1s ease;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
             cursor: pointer;
         }
         .nb-btn:hover {
@@ -199,12 +198,12 @@
             font-size: 0.85rem;
             color: #000;
             background: transparent;
-            transition: all 0.15s ease;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
         }
         .sidebar-cat-btn:hover { background: var(--nb-bg); }
         .sidebar-cat-btn.is-active {
             border-color: var(--nb-border);
-            background: var(--nb-yellow);
             box-shadow: 2px 2px 0px var(--nb-border);
         }
         .sidebar-cat-btn .cat-count {
@@ -218,7 +217,6 @@
             padding: 0.1rem 0.5rem;
         }
 
-        /* BOOT SCREEN / LOADING SCREEN POLOS */
         #loadingScreen {
             position: fixed; inset: 0; width: 100vw; height: 100vh;
             background: var(--nb-bg);
@@ -245,7 +243,6 @@
         }
         #welcomeModal.show { opacity: 1; pointer-events: auto; }
         
-        /* CARD WELCOME MODAL DENGAN BACKGROUND GRID KOTAK-KOTAK KECIL */
         .welcome-card {
             background-color: var(--nb-bg);
             background-image: 
@@ -266,7 +263,6 @@
             transform: scale(1);
         }
 
-        /* KOTAK PUBLIC KEY DI DALAM MODAL */
         .public-key-box {
             background-color: #ffffff;
             border: 3px solid var(--nb-border);
@@ -559,7 +555,6 @@
 
         @media (min-width: 1024px) { .desktop-menu { display: flex; } }
 
-        /* STYLING MODAL DONASI (QRIS ONLY) */
         .donasi-modal {
             position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center;
             background: rgba(0, 0, 0, 0.45); backdrop-filter: blur(5px); opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s ease; padding: 1rem;
@@ -582,7 +577,7 @@
 </head>
 <body class="antialiased">
 
-    <!-- MODAL DONASI INTERAKTIF (QRIS ONLY) -->
+    <!-- MODAL DONASI -->
     <div id="donasiModal" class="donasi-modal" role="dialog" aria-modal="true" aria-labelledby="donasiTitle">
         <div class="donasi-modal-box">
             <button type="button" id="donasiCloseBtn" class="donasi-close-btn" aria-label="Tutup">
@@ -598,7 +593,6 @@
                 Donasi kamu sangat membantu biaya perawatan server agar Melvin Rest Api tetap cepat & selalu aktif.
             </p>
 
-            <!-- PANEL QRIS ALL PAYMENT -->
             <div class="donasi-qr-wrap">
                 <img src="https://d.top4top.io/p_3869t7t6m1.jpg" alt="QRIS All Payment" class="donasi-qr-img" id="donasiQr-id">
             </div>
@@ -646,7 +640,6 @@
                 Silakan gunakan kunci akses publik di bawah ini untuk mulai menjelajahi dan menguji seluruh endpoint.
             </p>
 
-            <!-- KOTAK PUBLIC KEY DENGAN BACKGROUND GRID KOTAK-KOTAK KECIL -->
             <div class="public-key-box mb-6">
                 <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2">
@@ -843,7 +836,6 @@
         setInterval(updateWIBClock, 1000);
         updateWIBClock();
 
-        /* CONTROL LOGIKA MODAL DONASI (QRIS ONLY) */
         (function () {
             const modal = document.getElementById('donasiModal');
             if (!modal) return;
@@ -936,6 +928,19 @@
             'Social Media': 'fas fa-share-nodes',
             'Canvas': 'fas fa-palette'
         };
+
+        const nbColors = [
+            'var(--nb-yellow)', 
+            'var(--nb-blue)', 
+            'var(--nb-green)', 
+            'var(--nb-purple)', 
+            'var(--nb-pink)', 
+            'var(--nb-orange)'
+        ];
+
+        function getRandomNbColor() {
+            return nbColors[Math.floor(Math.random() * nbColors.length)];
+        }
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeApp();
@@ -1112,11 +1117,26 @@
             activeCategoryFilter = '';
 
             function syncActiveState(selectedCategory) {
+                const randomColor = getRandomNbColor();
+
                 document.querySelectorAll('.category-filter').forEach(f => {
-                    f.classList.toggle('is-active', f.dataset.category === selectedCategory);
+                    const isActive = f.dataset.category === selectedCategory;
+                    f.classList.toggle('is-active', isActive);
+                    if (isActive) {
+                        f.style.backgroundColor = randomColor;
+                    } else {
+                        f.style.backgroundColor = '#ffffff';
+                    }
                 });
+
                 document.querySelectorAll('.category-filter-sidebar').forEach(f => {
-                    f.classList.toggle('is-active', f.dataset.category === selectedCategory);
+                    const isActive = f.dataset.category === selectedCategory;
+                    f.classList.toggle('is-active', isActive);
+                    if (isActive) {
+                        f.style.backgroundColor = randomColor;
+                    } else {
+                        f.style.backgroundColor = 'transparent';
+                    }
                 });
             }
 
