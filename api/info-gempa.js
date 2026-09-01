@@ -173,8 +173,8 @@ async function getGempa() {
 module.exports = {
   name: "Info Gempa BMKG",
   desc: "Mendapatkan informasi gempa terbaru, realtime, dan gempa yang dirasakan dari BMKG",
-  category: "Tools",
-  path: "/api/tools/gempa",
+  category: "Information",
+  path: "/api/info/gempa",
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true }
