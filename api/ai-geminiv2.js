@@ -33,14 +33,14 @@ module.exports = {
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true },
-    text: { type: "string", required: true, example: "Halo, kenalin saya Melvin, nama kamu siapa?" },
+    text: { type: "string", required: true },
     model: {
       type: "select",
       required: false,
       selection: list_model,
       value: "gemini-3.7-flash-high"
     },
-    session_id: { type: "string", required: false, example: "" }
+    session_id: { type: "string", required: false }
   },
   async run(req, res, next) {
     try {

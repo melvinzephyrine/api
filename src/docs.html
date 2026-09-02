@@ -467,7 +467,7 @@
 
         .api-item-content {
             padding: 16px 20px; background-color: #ffffff; color: #000; border-radius: 14px;
-            display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none;
+            display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none;
             border: 3px solid var(--nb-border); box-shadow: 4px 4px 0px var(--nb-border); transition: all 0.15s ease;
         }
         .api-item-content:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px var(--nb-border); }
@@ -1275,13 +1275,13 @@
                         html += `
                             <div class="api-item" data-method="${method.toLowerCase()}" data-path="${path}" data-alias="${itemName}">
                                 <div class="api-item-content" onclick="toggleEndpoint(${catIndex}, ${endpointIndex}, this)">
-                                    <div>
-                                        <h5 class="font-display font-extrabold text-black text-sm">${itemName}</h5>
-                                        <p class="mb-0 text-muted">${itemDesc}</p>
+                                    <div class="min-w-0 flex-1 pr-3">
+                                        <h5 class="font-display font-extrabold text-black text-sm truncate">${itemName}</h5>
+                                        <p class="mb-0 text-muted line-clamp-2 break-words">${itemDesc}</p>
                                     </div>
-                                    <div class="flex items-center gap-2 shrink-0">
-                                        <button class="btn-dark-custom">${method}</button>
-                                        <i class="fas fa-chevron-down text-xs text-black"></i>
+                                    <div class="flex items-center gap-2 shrink-0 ml-auto">
+                                        <button class="btn-dark-custom shrink-0">${method}</button>
+                                        <i class="fas fa-chevron-down text-xs text-black shrink-0"></i>
                                     </div>
                                 </div>
 

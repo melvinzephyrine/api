@@ -1,6 +1,6 @@
 const axios = require('axios');
 const crypto = require('crypto');
-const FormData = require('form-data');
+const { createClient } = require('@supabase/supabase-js');
 
 const listvoice_indo = {
   'Gadis': '173',
@@ -82,22 +82,53 @@ function randomRevenuecatId() {
 }
 
 async function uploadToZFile(audioBuffer, filename = "voiser-tts.mp3") {
-  const form = new FormData();
-  form.append('file', audioBuffer, {
-    filename: filename,
-    contentType: 'audio/mpeg'
-  });
-  form.append('expiry', 'never');
+  const initRes = await axios.post(
+    'https://zfile.web.id/api/v1/upload/init',
+    {
+      filename: filename,
+      size: audioBuffer.length,
+      mimeType: 'audio/mpeg',
+      expiry: 'never'
+    },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000
+    }
+  );
 
-  const res = await axios.post('https://zfile.web.id/api/upload', form, {
-    headers: form.getHeaders(),
-    timeout: 30000
-  });
+  const initData = initRes.data;
 
-  if (res.data && res.data.url) {
-    return res.data.url;
+  if (initData.deduped && initData.url) {
+    return initData.url;
   }
-  throw new Error(`Gagal upload ke zfile: ${JSON.stringify(res.data)}`);
+
+  const { supabaseUrl, anonKey, bucket, path: storagePath, token } = initData.upload;
+  const supabase = createClient(supabaseUrl, anonKey);
+
+  const { error: uploadError } = await supabase.storage
+    .from(bucket)
+    .uploadToSignedUrl(storagePath, token, audioBuffer, {
+      contentType: 'audio/mpeg'
+    });
+
+  if (uploadError) {
+    throw new Error(`Upload Supabase gagal: ${uploadError.message}`);
+  }
+
+  const finalRes = await axios.post(
+    'https://zfile.web.id/api/v1/upload/finalize',
+    { ticket: initData.ticket },
+    {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 15000
+    }
+  );
+
+  if (!finalRes.data?.url) {
+    throw new Error('Gagal mendapatkan tautan publik dari Zfile');
+  }
+
+  return finalRes.data.url;
 }
 
 async function voiserTTS(text, model) {
@@ -165,9 +196,9 @@ async function voiserTTS(text, model) {
 
 module.exports = {
   name: "Text To Speech",
-  desc: "Mengubah teks menjadi suara AI multi-bahasa menggunakan Voiser AI",
+  desc: "Convert text to high-quality multi-language speech using Voiser AI.",
   category: "Tools",
-  path: "/api/tools/voiser",
+  path: "/api/tools/tts",
   method: "GET",
   parameters: {
     apikey: { type: "string", required: true },
@@ -185,7 +216,7 @@ module.exports = {
       const text = req.query.text || req.body?.text;
       const model = req.query.model || req.body?.model || "Gadis";
 
-      if (!global.apikey.includes(apikey)) {
+      if (!global.apikey || !global.apikey.includes(apikey)) {
         return res.status(403).json({ status: false, error: "Apikey invalid" });
       }
 
@@ -208,7 +239,6 @@ module.exports = {
       if (zfileUrl) {
         return res.json({
           status: true,
-          creator: "Melvin Rest Api",
           result: {
             id: id,
             text: text,
