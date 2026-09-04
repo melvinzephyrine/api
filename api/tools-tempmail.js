@@ -1,150 +1,144 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const BASE_URL = 'https://tempmail-backend.hasnaintariq142.workers.dev';
+const CREATE_INBOX_URL = `${BASE_URL}/api/create-inbox`;
+const CHECK_INBOX_URL = `${BASE_URL}/api/inbox`;
 
-const generatorEmail = {
-  api: { base: 'https://generator.email/', validate: 'uptime.php' },
-  defaultHeaders: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-    'Accept-Language': 'id-ID,id;q=0.9,en;q=0.8',
-    'Referer': 'https://generator.email/'
-  },
-  _cookie: '',
+const HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Mobile Safari/537.36',
+  'Referer': 'https://tempmail.chat/',
+  'Origin': 'https://tempmail.chat',
+  'Content-Type': 'application/json'
+};
 
-  async _f(u, o = {}, r = 3) {
-    for (let i = 0; i < r; i++) {
+function cleanHtmlWithLinks(htmlString) {
+  if (!htmlString) return { text: '', links: [] };
+
+  const $ = cheerio.load(htmlString);
+  $('script, style, meta, link, img').remove();
+
+  const links = [];
+  $('a').each((_, elem) => {
+    const url = $(elem).attr('href');
+    const text = $(elem).text().trim();
+    if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+      links.push({ text: text || 'Link', url });
+    }
+  });
+
+  $('a').replaceWith(function() {
+    const url = $(this).attr('href');
+    const text = $(this).text().trim() || 'Link';
+    return `\n🔗 ${text}\n ${url}\n`;
+  });
+
+  const text = $.text();
+  return {
+    text: text.replace(/\n\s*\n/g, '\n\n').trim(),
+    links
+  };
+}
+
+module.exports = [
+  {
+    name: "Temp Mail Create",
+    desc: "Generate temporary disposable email inbox with access token for authentication.",
+    category: "Tools",
+    path: "/api/tools/tempmail",
+    method: "GET",
+    parameters: {
+      apikey: { type: "string", required: true }
+    },
+    async run(req, res) {
+      const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey || req.headers['x-apikey'];
+
+      if (!global.apikey || !global.apikey.includes(apikey)) {
+        return res.status(403).json({ status: false, error: "Apikey invalid" });
+      }
+
       try {
-        const headers = { ...this.defaultHeaders, ...(o.headers || {}) };
-        if (this._cookie && !headers.Cookie) headers.Cookie = this._cookie;
-        const res = await axios({
-          url: u,
-          method: o.method || 'GET',
-          headers,
-          data: o.body,
-          timeout: 15000,
-          validateStatus: s => s < 500,
-          responseType: o._t ? 'text' : 'json'
-        });
-        const sc = res.headers['set-cookie'];
-        if (sc) {
-          for (const c of sc) {
-            const [pair] = c.split(';');
-            const [k] = pair.split('=');
-            const keep = this._cookie.split('; ').filter(p => p && !p.startsWith(k + '='));
-            keep.push(pair);
-            this._cookie = keep.join('; ');
-          }
+        const { data } = await axios.post(CREATE_INBOX_URL, null, { headers: HEADERS, timeout: 15000 });
+
+        if (!data.success) {
+          throw new Error("Gagal membuat inbox temp mail.");
         }
-        return res.data;
-      } catch (e) {
-        if (i === r - 1) throw e;
-        await sleep(800);
+
+        return res.json({
+          status: true,
+          result: {
+            email: data.email,
+            token: data.access_token
+          }
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: false,
+          error: err.response?.data?.message || err.message || "Gagal membuat email sementara"
+        });
       }
     }
   },
+  {
+    name: "Temp Mail Inbox",
+    desc: "Retrieve and inspect received messages and verification links from a temporary email token.",
+    category: "Tools",
+    path: "/api/tools/tempmail-inbox",
+    method: "GET",
+    parameters: {
+      apikey: { type: "string", required: true },
+      token: { type: "string", required: true }
+    },
+    async run(req, res) {
+      const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey || req.headers['x-apikey'];
+      const token = req.query.token || req.body?.token;
 
-  async generate() {
-    this._cookie = 'samesite=lax;';
-    const rand = Math.random().toString(36).substring(2, 11);
-    const path = 'ichecker.tech/' + rand + '/';
-    this._cookie += ' inbox_ctx=' + encodeURIComponent(path) + ';';
-
-    await this._f(this.api.base, { headers: { Cookie: this._cookie }, _t: 1 });
-    await sleep(700);
-    await this._f(this.api.base, { headers: { Cookie: this._cookie }, _t: 1 });
-    await sleep(500);
-
-    const h = await this._f(this.api.base, { headers: { Cookie: this._cookie }, _t: 1 });
-    const $ = cheerio.load(h);
-    let em = $('#email_ch_text').text().trim();
-
-    if (!em) {
-      await sleep(1000);
-      const h2 = await this._f(this.api.base, { headers: { Cookie: this._cookie }, _t: 1 });
-      em = cheerio.load(h2)('#email_ch_text').text().trim();
-    }
-
-    if (!em) throw new Error('Gagal generate email');
-
-    const [u, d] = em.split('@');
-    await this._f(this.api.base + this.api.validate, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ usr: u, dmn: d })
-    });
-
-    for (let i = 0; i < 5; i++) {
-      await this.inbox(em);
-      await sleep(900);
-    }
-
-    return em;
-  },
-
-  async inbox(em) {
-    const [u, d] = em.split('@');
-    const ck = 'inbox_ctx=' + encodeURIComponent(d + '/' + u + '/');
-    try {
-      const h = await this._f(this.api.base, { headers: { Cookie: ck }, _t: 1 });
-      if (typeof h === 'string' && h.includes('Email generator is ready')) return [];
-      const $ = cheerio.load(h || '');
-      const ib = [];
-      const rows = $('[onclick]').toArray();
-      for (const row of rows) {
-        const onclick = $(row).attr('onclick') || '';
-        const match = onclick.match(/loadInboxClientSide\('([^']+)'\)/) || onclick.match(/'([^']+)'/);
-        if (!match || !match[1].includes('/')) continue;
-        try {
-          const html = await this._f(this.api.base + 'inbox1/', {
-            headers: { Cookie: 'inbox_ctx=' + encodeURIComponent(match[1]) },
-            _t: 1
-          });
-          const m = cheerio.load(html);
-          const from = m('.from_div_45g45gg').text().trim() || m('.wbreak').eq(1).text().trim();
-          const subject = m('.subj_div_45g45gg').text().trim() || m('.subj-h1').text().trim();
-          const created = m('.time_div_45g45gg').text().trim();
-          const message = m('.mess_bodiyy').first().text().trim();
-          const links = [];
-          m('.mess_bodiyy').first().find('a').each((i, el) => {
-            let href = m(el).attr('href');
-            if (href) links.push(href.startsWith('http') ? href : new URL(href, this.api.base).href);
-          });
-          if (from || subject || message) ib.push({ from, to: em, created, subject, message, links });
-        } catch {}
+      if (!global.apikey || !global.apikey.includes(apikey)) {
+        return res.status(403).json({ status: false, error: "Apikey invalid" });
       }
-      return ib;
-    } catch {
-      return [];
+
+      if (!token || typeof token !== "string" || !token.trim()) {
+        return res.status(400).json({ status: false, error: "Parameter 'token' wajib diisi!" });
+      }
+
+      try {
+        const { data } = await axios.get(CHECK_INBOX_URL, {
+          params: { token: token.trim() },
+          headers: HEADERS,
+          timeout: 20000
+        });
+
+        if (!data.success) {
+          return res.status(400).json({ status: false, error: "Token tidak valid atau kadaluarsa" });
+        }
+
+        const rawMessages = data.messages || [];
+        const messages = rawMessages.map(msg => {
+          const { text, links } = cleanHtmlWithLinks(msg.html_body);
+          return {
+            id: msg.id,
+            from: msg.sender_name || msg.sender,
+            sender_email: msg.sender,
+            subject: msg.subject,
+            received_at: msg.received_at,
+            content_text: text || msg.text_body || "",
+            links: links
+          };
+        });
+
+        return res.json({
+          status: true,
+          result: {
+            total_messages: messages.length,
+            messages: messages
+          }
+        });
+      } catch (err) {
+        return res.status(500).json({
+          status: false,
+          error: err.response?.data?.message || err.message || "Gagal memeriksa pesan masuk"
+        });
+      }
     }
   }
-};
-
-module.exports = {
-  name: "Temp-Mail",
-  desc: "Generate temporary email otomatis",
-  category: "Tools",
-  parameters: {
-    apikey: { type: "string" }
-  },
-  path: "/api/tools/tempmail",
-  async run(req, res) {
-    const { apikey } = req.query;
-    if (!apikey || !global.apikey.includes(apikey))
-      return res.json({ status: false, error: "Apikey invalid" });
-
-    try {
-      const email = await generatorEmail.generate();
-      return res.json({
-        status: true,
-        creator: "t.me/luyatiem",
-        success: true,
-        email,
-        emailStatus: "good"
-      });
-    } catch (err) {
-      res.status(500).json({ status: false, error: err.message });
-    }
-  }
-};
+];

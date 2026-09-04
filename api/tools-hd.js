@@ -140,23 +140,24 @@ async function cekjob(taskId, fp) {
 module.exports = [
   {
     name: "Upscale Image",
-    desc: "Meningkatkan kualitas/resolusi gambar menjadi HD",
+    desc: "Enhance image resolution and clarity up to 4x HD quality.",
     category: "Tools",
-    parameters: {
-      apikey: { type: "string" },
-      url: { type: "string" }
-    },
     path: "/api/tools/hd",
+    method: "GET",
+    parameters: {
+      apikey: { type: "string", required: true },
+      url: { type: "string", required: true }
+    },
     async run(req, res) {
-      const apikey = req.query.apikey || req.body?.apikey;
+      const apikey = req.apiKeyInput || req.query.apikey || req.body?.apikey || req.headers['x-apikey'];
       let url = req.query.url || req.body?.url;
 
-      if (!global.apikey.includes(apikey)) {
-        return res.json({ status: false, error: "Apikey invalid" });
+      if (!global.apikey || !global.apikey.includes(apikey)) {
+        return res.status(403).json({ status: false, error: "Apikey invalid" });
       }
 
-      if (!url) {
-        return res.json({ status: false, error: "Url gambar wajib diisi" });
+      if (!url || typeof url !== "string" || !url.trim()) {
+        return res.status(400).json({ status: false, error: "Url gambar wajib diisi" });
       }
 
       try {
@@ -171,10 +172,10 @@ module.exports = [
 
         let resultData;
         let attempts = 0;
-        const maxAttempts = 15;
+        const maxAttempts = 20;
 
         while (attempts < maxAttempts) {
-          await new Promise(r => setTimeout(r, 3000));
+          await new Promise(r => setTimeout(r, 2000));
           resultData = await cekjob(taskId, uploadInfo.fp);
 
           if (resultData && resultData.status === 2) break;
@@ -186,17 +187,17 @@ module.exports = [
           throw new Error("Proses upscale terlalu lama (Timeout)");
         }
 
-        res.json({
+        return res.json({
           status: true,
           result: {
             task_id: taskId,
             scale: `${scaleFactor}x`,
-            url: 'https://temp.live3d.io/' + resultData.result_image
+            result_url: 'https://temp.live3d.io/' + resultData.result_image
           }
         });
 
       } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
           status: false,
           error: err.message || 'Terjadi kesalahan pada server'
         });
