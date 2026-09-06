@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f8f6f0" />
+    
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+
+    <title>Melvin Rest Api — API Reference</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Space+Grotesk:wght@700;800;900&family=Fira+Code:wght@500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --nb-bg: #f8f6f0;
+            --nb-card: #ffffff;
+            --nb-border: #000000;
+            --nb-yellow: #fef08a;
+            --nb-blue: #93c5fd;
+            --nb-green: #bbf7d0;
+            --nb-purple: #e9d5ff;
+            --nb-pink: #fbcfe8;
+            --nb-orange: #ff5722;
+            --nb-text: #000000;
+        }
+
+        * { box-sizing: border-box; }
+
+        /* BACKGROUND GRID KOTAK-KOTAK KECIL */
+        body {
+            background-color: var(--nb-bg);
+            background-image: 
+                linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: var(--nb-text);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono { font-family: 'Fira Code', monospace; }
+
+        /* BOOT SCREEN POLOS (TANPA PATTERN BINTIK / KOTAK) */
+        #bootLoadingScreen {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--nb-bg); /* Latar polos tanpa background-image */
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
+        }
+
+        .boot-badge {
+            background-color: #ffffff;
+            border: 3.5px solid #000000;
+            border-radius: 16px;
+            padding: 0.6rem 1.2rem;
+            box-shadow: 4px 4px 0px #000000;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .boot-api-pill {
+            background-color: var(--nb-green);
+            border: 2.5px solid #000000;
+            border-radius: 10px;
+            padding: 0.1rem 0.6rem;
+            font-size: 1.2rem;
+        }
+
+        .boot-progress-bar {
+            width: 260px;
+            height: 20px;
+            background: #ffffff;
+            border: 3.5px solid #000000;
+            border-radius: 12px;
+            padding: 2.5px;
+            box-shadow: 4px 4px 0px #000000;
+            overflow: hidden;
+            margin-bottom: 0.8rem;
+        }
+
+        .boot-progress-fill {
+            height: 100%;
+            background-color: var(--nb-yellow);
+            border-radius: 6px;
+            width: 0%;
+            animation: fillProgress3s 3s ease-in-out forwards;
+        }
+
+        @keyframes fillProgress3s {
+            0% { width: 0%; }
+            30% { width: 35%; }
+            70% { width: 75%; }
+            100% { width: 100%; }
+        }
+
+        .boot-status-pill {
+            background-color: var(--nb-green);
+            border: 2.5px solid #000000;
+            border-radius: 12px;
+            padding: 0.35rem 1rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            box-shadow: 2.5px 2.5px 0px #000000;
+        }
+
+        .brand-rest-pill {
+            background-color: var(--nb-blue);
+            color: #000000;
+            border: 2px solid var(--nb-border);
+            border-radius: 8px;
+            padding: 0.15rem 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 800;
+            box-shadow: 2px 2px 0px #000000;
+            text-transform: uppercase;
+        }
+
+        .nb-card {
+            background-color: var(--nb-card);
+            border: 3px solid var(--nb-border);
+            border-radius: 16px;
+            box-shadow: 4px 4px 0px var(--nb-border);
+            transition: all 0.15s ease;
+        }
+
+        .nb-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background-color: var(--nb-card);
+            border: 3px solid var(--nb-border);
+            border-radius: 12px;
+            color: var(--nb-text);
+            font-weight: 800;
+            padding: 0.6rem 1.2rem;
+            box-shadow: 3px 3px 0px var(--nb-border);
+            transition: all 0.1s ease;
+            cursor: pointer;
+        }
+        .nb-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--nb-border);
+        }
+        .nb-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--nb-border);
+        }
+
+        .nb-btn-primary { background-color: var(--nb-blue); }
+        .nb-btn-yellow { background-color: var(--nb-yellow); }
+
+        .fixed-navbar {
+            position: sticky; top: 0; z-index: 50;
+            background: var(--nb-bg);
+            border-bottom: 3px solid var(--nb-border);
+        }
+
+        .brand-logo {
+            width: 38px; height: 38px;
+            object-fit: cover;
+            border: 2px solid var(--nb-border);
+            border-radius: 10px;
+            background: var(--nb-yellow);
+        }
+
+        .title-alby-style {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 0.5rem;
+        }
+        .title-alby-main {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            color: #000000;
+            line-height: 1;
+        }
+        .title-alby-pill {
+            display: inline-block;
+            background-color: var(--nb-green);
+            color: #000000;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 0.15rem 0.75rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            box-shadow: 3px 3px 0px #000000;
+            text-transform: uppercase;
+        }
+
+        .stats-grid-row {
+            display: grid;
+            grid-template-cols: 1fr 1fr;
+            gap: 0.6rem;
+            width: 100%;
+            margin-top: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+        .stat-box-compact {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 1rem;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            box-shadow: 3px 3px 0px #000000;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            transition: all 0.15s ease;
+        }
+        .stat-box-compact:hover {
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 4.5px 4.5px 0px #000000;
+        }
+
+        /* CUSTOM DROPDOWN SELECT METHOD */
+        .custom-dropdown-container {
+            position: relative;
+            width: 100%;
+        }
+        .custom-dropdown-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #000000;
+            box-shadow: 3.5px 3.5px 0px #000000;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .custom-dropdown-btn:hover {
+            background-color: var(--nb-yellow);
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 5px 5px 0px #000000;
+        }
+        .custom-dropdown-list {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            width: 100%;
+            background-color: #ffffff;
+            border: 0px solid #000000;
+            border-radius: 12px;
+            margin-top: 0rem;
+            box-shadow: 0px 0px 0px #000000;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.25s ease-in-out, 
+                        margin-top 0.2s ease,
+                        border-width 0.15s ease,
+                        box-shadow 0.25s ease;
+        }
+        .custom-dropdown-container.is-open .custom-dropdown-list {
+            max-height: 320px;
+            opacity: 1;
+            margin-top: 0.5rem;
+            border-width: 3px;
+            box-shadow: 3.5px 3.5px 0px #000000;
+        }
+        .custom-dropdown-container.is-open .dropdown-chevron {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-option {
+            padding: 0.65rem 1rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #000000;
+            border-bottom: 2px solid #000000;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            opacity: 0;
+            transform: translateY(-8px);
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        background-color 0.15s ease;
+        }
+
+        .custom-dropdown-container.is-open .custom-dropdown-option {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(1) { transition-delay: 0.05s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(2) { transition-delay: 0.09s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(3) { transition-delay: 0.13s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(4) { transition-delay: 0.17s; }
+        .custom-dropdown-container.is-open .custom-dropdown-option:nth-child(5) { transition-delay: 0.21s; }
+
+        .custom-dropdown-option:last-child {
+            border-bottom: none;
+        }
+        .custom-dropdown-option:hover, .custom-dropdown-option.is-selected {
+            background-color: var(--nb-yellow);
+        }
+
+        /* SAFE PADDING UNTUK MEMPERBAIKI BORDER KATEGORI YANG TERPOTONG */
+        .cat-pills-wrap {
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        #catPills {
+            display: flex;
+            gap: 0.65rem;
+            overflow-x: auto;
+            padding-top: 10px;    /* PADDING ATAS AGAR TRANSFORM TOMBOL TIDAK TERPOTONG */
+            padding-bottom: 12px; /* PADDING BAWAH UNTUK OFFSET BORDER */
+            padding-left: 4px;
+            padding-right: 4px;
+            margin-top: -6px;
+        }
+        .cat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 2.5px solid var(--nb-border);
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 0.5rem 1.1rem;
+            white-space: nowrap;
+            cursor: pointer;
+            background: #ffffff;
+            color: #000;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+            box-shadow: 2.5px 2.5px 0px var(--nb-border);
+            flex-shrink: 0;
+        }
+        .cat-pill i {
+            font-size: 1.05rem;
+        }
+        .cat-pill.active, .cat-pill:hover {
+            background: var(--nb-yellow);
+            transform: translate(-1.5px, -1.5px);
+            box-shadow: 4px 4px 0px var(--nb-border);
+        }
+
+        .method-badge {
+            font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 800;
+            padding: 0.25rem 0.65rem; border-radius: 8px; border: 2px solid var(--nb-border);
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px var(--nb-border);
+        }
+        .method-get { background-color: var(--nb-blue); color: #000; }
+        .method-post { background-color: var(--nb-green); color: #000; }
+        .method-put { background-color: var(--nb-yellow); color: #000; }
+        .method-delete { background-color: var(--nb-pink); color: #000; }
+
+        /* STYLING ROW ENDPOINT & ACCORDION DETAIL */
+        .endpoint-row {
+            border: 3px solid var(--nb-border); border-radius: 14px; background: #ffffff;
+            box-shadow: 4px 4px 0px var(--nb-border);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            overflow: hidden;
+        }
+        .endpoint-row:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--nb-border);
+        }
+
+        /* DETAIL PANEL ACCORDION SMOOTH SLIDE */
+        .ep-detail-wrap {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), 
+                        opacity 0.25s ease-in-out,
+                        padding 0.25s ease;
+            border-top: 0px solid var(--nb-border);
+            background: var(--nb-bg);
+        }
+        .endpoint-row.is-open .ep-detail-wrap {
+            max-height: 500px;
+            opacity: 1;
+            border-top: 3px solid var(--nb-border);
+        }
+
+        .param-chip {
+            font-family: 'Fira Code', monospace; font-size: 0.75rem;
+            background: var(--nb-yellow); border: 2px solid var(--nb-border); border-radius: 8px;
+            padding: 0.2rem 0.55rem; font-weight: 700; color: #000;
+            box-shadow: 2px 2px 0px var(--nb-border);
+        }
+        .param-chip.required { background: var(--nb-pink); }
+
+        .sidebar-link {
+            display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.8rem; border-radius: 10px;
+            font-size: 0.85rem; font-weight: 800; color: #000; transition: all 0.15s ease;
+            border: 2px solid transparent;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: var(--nb-yellow);
+            border-color: var(--nb-border);
+            box-shadow: 2px 2px 0px var(--nb-border);
+        }
+
+        a { text-decoration: none; color: inherit; }
+
+        .loader {
+            width: 40px; height: 40px;
+            background-color: var(--nb-yellow);
+            border: 3px solid var(--nb-border);
+            box-shadow: 4px 4px 0px var(--nb-border);
+            animation: loaderSpin 0.8s infinite linear;
+        }
+        @keyframes loaderSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* MODAL DONASI INTERAKTIF (QRIS ONLY) */
+        .donasi-modal {
+            position: fixed; inset: 0; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(5px);
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0.2s ease;
+            padding: 1rem;
+        }
+        .donasi-modal.show { opacity: 1; visibility: visible; }
+        .donasi-modal-box {
+            position: relative;
+            background: #ffffff;
+            border: 3.5px solid var(--nb-border);
+            border-radius: 20px;
+            max-width: 420px; width: 100%;
+            padding: 1.75rem;
+            box-shadow: 8px 8px 0px var(--nb-border);
+            transform: translateY(20px);
+            transition: transform 0.2s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .donasi-modal.show .donasi-modal-box { transform: translateY(0); }
+        .donasi-close-btn {
+            position: absolute; top: 1rem; right: 1rem;
+            width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+            border: 2.5px solid var(--nb-border); border-radius: 10px; background: var(--nb-pink);
+            color: #000; cursor: pointer; font-size: 1rem; font-weight: 800;
+            box-shadow: 2px 2px 0px var(--nb-border); transition: all 0.15s ease;
+        }
+        .donasi-close-btn:hover { background: #f472b6; transform: translate(-1px, -1px); }
+
+        .donasi-qr-wrap {
+            background: #fff; border-radius: 16px; padding: 0.75rem; margin-bottom: 1rem;
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid var(--nb-border); box-shadow: 4px 4px 0px var(--nb-border);
+        }
+        .donasi-qr-img { width: 100%; max-width: 220px; aspect-ratio: 1 / 1; object-fit: contain; display: block; margin: 0 auto; border-radius: 8px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- BOOT / LOADING SCREEN NEOBRUTALISM (PAS 3 DETIK) -->
+    <div id="bootLoadingScreen">
+        <div class="boot-badge">
+            Melvin<span class="boot-api-pill">API</span>
+        </div>
+        <div class="boot-progress-bar">
+            <div class="boot-progress-fill"></div>
+        </div>
+        <div class="boot-status-pill" id="bootStatusText">
+            LOADING ENDPOINTS (0%)
+        </div>
+    </div>
+
+    <!-- MODAL DONASI INTERAKTIF (QRIS ONLY) -->
+    <div id="donasiModal" class="donasi-modal" role="dialog" aria-modal="true" aria-labelledby="donasiTitle">
+        <div class="donasi-modal-box">
+            <button type="button" id="donasiCloseBtn" class="donasi-close-btn" aria-label="Tutup">
+                <i class="fas fa-xmark"></i>
+            </button>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="w-8 h-8 rounded-xl bg-[var(--nb-pink)] border-2.5 border-black flex items-center justify-center text-black text-sm shadow-[2px_2px_0px_#000]">
+                    <i class="fas fa-heart text-red-500"></i>
+                </span>
+                <h2 id="donasiTitle" class="font-display font-extrabold text-2xl">Dukung Melvin API</h2>
+            </div>
+            <p class="text-xs font-bold leading-relaxed mb-4 text-gray-700">
+                Donasi kamu sangat membantu biaya perawatan server agar Melvin Rest Api tetap cepat & selalu aktif.
+            </p>
+
+            <!-- PANEL QRIS ALL PAYMENT -->
+            <div class="donasi-qr-wrap">
+                <img src="https://d.top4top.io/p_3869t7t6m1.jpg" alt="QRIS All Payment" class="donasi-qr-img" id="donasiQr-id">
+            </div>
+            <button type="button" class="nb-btn nb-btn-primary w-full py-2.5 text-xs font-extrabold donasi-download-btn"
+                    data-download-url="https://d.top4top.io/p_3869t7t6m1.jpg" data-download-name="QRIS-Melvin-Api.jpg">
+                <i class="fas fa-download"></i> Simpan Gambar QRIS
+            </button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <nav class="fixed-navbar">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 sm:gap-3">
+                <img src="https://k.top4top.io/p_3886wxxuk1.jpg" alt="Yj Logo" class="brand-logo" onerror="this.style.display='none'">
+                <div class="flex items-center gap-1.5 font-display font-extrabold text-xl">
+                    <span>Melvin</span>
+                    <span class="brand-rest-pill">REST API</span>
+                </div>
+            </a>
+            
+            <div class="hidden md:flex items-center gap-6">
+                <button type="button" data-donasi-open class="font-bold text-sm hover:underline flex items-center gap-1.5" style="background:none; border:none; cursor:pointer;">
+                    <i class="fas fa-heart text-red-500"></i> Donasi
+                </button>
+                <a href="/docs" class="nb-btn nb-btn-primary py-2 px-4 text-xs font-extrabold">
+                    <i class="fas fa-book"></i> Open Docs
+                </a>
+            </div>
+
+            <div class="md:hidden flex items-center gap-2">
+                <button type="button" data-donasi-open class="nb-btn nb-btn-yellow py-2 px-3 text-xs" aria-label="Donasi">
+                    <i class="fas fa-heart text-red-500"></i>
+                </button>
+                <a href="/docs" class="nb-btn nb-btn-primary py-2 px-3 text-xs font-extrabold">
+                    Open Docs
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content Container -->
+    <div class="max-w-7xl mx-auto px-4 py-10">
+        <div class="mb-6">
+            <div class="title-alby-style">
+                <span class="title-alby-main">API</span>
+                <span class="title-alby-pill">REFERENCE</span>
+            </div>
+            <p class="font-bold text-sm sm:text-base text-gray-800 leading-relaxed max-w-3xl">
+                Dokumentasi resmi seluruh endpoint Melvin Rest Api. Cari endpoint, lihat struktur parameter, serta contoh request URL secara lengkap.
+            </p>
+
+            <!-- STATS WIDGET SEJAJAR HORIZONTAL (KIRI & KANAN) -->
+            <div class="stats-grid-row">
+                <div class="stat-box-compact bg-[var(--nb-purple)]">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-layer-group text-black text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs uppercase font-mono tracking-wider">Total Categories</span>
+                    </div>
+                    <span id="quickCatCount" class="font-mono text-lg font-extrabold text-black">—</span>
+                </div>
+                <div class="stat-box-compact bg-[var(--nb-blue)]">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-cubes text-black text-sm sm:text-base"></i>
+                        <span class="text-[11px] sm:text-xs uppercase font-mono tracking-wider">Total Endpoints</span>
+                    </div>
+                    <span id="quickEpCount" class="font-mono text-lg font-extrabold text-black">—</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH INPUT DAN CUSTOM DROPDOWN NEUBRUTALISM STAGGERED SLIDE DOWN -->
+        <div class="space-y-3 mb-6">
+            <div class="relative w-full">
+                <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-sm"></i>
+                <input id="searchInput" type="text" placeholder="Cari nama endpoint, path, kategori..."
+                       class="w-full border-3 border-black rounded-xl pl-11 pr-4 py-3 text-sm font-extrabold bg-white text-black shadow-[3.5px_3.5px_0px_#000] focus:outline-none transition-all">
+            </div>
+
+            <!-- DROPDOWN DENGAN ANIMASI TERSUSUN 1 PER 1 DARI ATAS KE BAWAH -->
+            <div class="custom-dropdown-container" id="customDropdown">
+                <button type="button" class="custom-dropdown-btn" id="dropdownToggleBtn">
+                    <span id="dropdownCurrentLabel">Semua Metode</span>
+                    <i class="fas fa-chevron-down dropdown-chevron transition-transform duration-200"></i>
+                </button>
+                <div class="custom-dropdown-list" id="dropdownOptionList">
+                    <div class="custom-dropdown-option is-selected" data-value="">
+                        <span>Semua Metode</span>
+                        <i class="fas fa-check text-xs"></i>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="GET">
+                        <span>GET</span>
+                        <span class="method-badge method-get">GET</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="POST">
+                        <span>POST</span>
+                        <span class="method-badge method-post">POST</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="PUT">
+                        <span>PUT</span>
+                        <span class="method-badge method-put">PUT</span>
+                    </div>
+                    <div class="custom-dropdown-option" data-value="DELETE">
+                        <span>DELETE</span>
+                        <span class="method-badge method-delete">DELETE</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KATEGORI PILLS TERPROTEKSI TERHADAP BORDER TERPOTONG -->
+        <div class="cat-pills-wrap">
+            <div id="catPills"></div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+            <div class="loader"></div>
+            <p class="text-sm font-extrabold">Memuat endpoint...</p>
+        </div>
+
+        <!-- Main Workspace -->
+        <div id="content" class="hidden grid lg:grid-cols-[260px_1fr] gap-8">
+            <aside class="hidden lg:block">
+                <div class="sticky top-24 nb-card p-4">
+                    <p class="text-xs font-extrabold uppercase tracking-wider mb-3 px-1">Kategori</p>
+                    <nav id="sidebarNav" class="space-y-1 max-h-[65vh] overflow-y-auto pr-1"></nav>
+                    <div class="mt-6 p-3 border-2.5 border-black rounded-xl text-xs font-bold bg-[var(--nb-purple)] shadow-[2.5px_2.5px_0px_#000]">
+                        <p class="font-extrabold mb-1">Base URL</p>
+                        <code id="baseUrl" class="font-mono text-[11px] break-all bg-white px-2 py-1 rounded border border-black block mb-2 font-extrabold"></code>
+                        <p class="font-extrabold mb-1">Apikey Demo</p>
+                        <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black font-extrabold">mlvn</code> / <code class="font-mono bg-white px-1.5 py-0.5 rounded border border-black font-extrabold">1</code>
+                    </div>
+                </div>
+            </aside>
+
+            <main>
+                <div id="endpointList" class="space-y-6"></div>
+                <div id="emptyState" class="hidden text-center py-16 nb-card">
+                    <p class="font-display font-extrabold text-xl mb-2">Tidak ada hasil ditemukan</p>
+                    <p class="text-sm font-semibold text-gray-700">Coba gunakan kata kunci lain atau reset filter pencarian Anda.</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="border-t-3 border-black py-8 mt-16 bg-[var(--nb-yellow)]">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <img src="https://k.top4top.io/p_3886wxxuk1.jpg" alt="Melvin Logo" class="brand-logo" style="width:30px;height:30px;" onerror="this.style.display='none'">
+                <span class="font-mono text-xs sm:text-sm font-extrabold">© 2026 Melvin Rest Api v1.0 · @viñn. - t.me/luyatiem</span>
+            </div>
+            <div class="flex gap-4 text-sm font-extrabold">
+                <a href="/" class="hover:underline">Home</a>
+                <a href="/docs" class="hover:underline">Open Docs</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        /* CONTROL BOOT SCREEN LOADING PAS 3 DETIK (3000ms) */
+        (function () {
+            const bootScreen = document.getElementById('bootLoadingScreen');
+            const bootText = document.getElementById('bootStatusText');
+            let start = Date.now();
+            let duration = 3000;
+
+            let interval = setInterval(() => {
+                let elapsed = Date.now() - start;
+                let progress = Math.min(Math.floor((elapsed / duration) * 100), 100);
+                if (bootText) {
+                    if (progress < 40) {
+                        bootText.textContent = `INITIALIZING DATA (${progress}%)`;
+                    } else if (progress < 85) {
+                        bootText.textContent = `BUILDING ENDPOINTS (${progress}%)`;
+                    } else {
+                        bootText.textContent = `READY (${progress}%)`;
+                    }
+                }
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        if (bootScreen) {
+                            bootScreen.style.opacity = '0';
+                            bootScreen.style.visibility = 'hidden';
+                        }
+                    }, 100);
+                }
+            }, 50);
+        })();
+
+        /* CONTROL LOGIKA MODAL DONASI (QRIS ONLY) */
+        (function () {
+            const modal = document.getElementById('donasiModal');
+            if (!modal) return;
+            const closeBtn = document.getElementById('donasiCloseBtn');
+            const openBtns = document.querySelectorAll('[data-donasi-open]');
+
+            function openModal() {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeModal() {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+            openBtns.forEach(function (btn) {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    openModal();
+                });
+            });
+            if (closeBtn) closeBtn.addEventListener('click', closeModal);
+            modal.addEventListener('click', function (e) {
+                if (e.target === modal) closeModal();
+            });
+            document.addEventListener('keydown', function (e) {
+                if (e.key === 'Escape' && modal.classList.contains('show')) closeModal();
+            });
+
+            function downloadImage(url, filename, btn) {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengunduh...';
+                btn.disabled = true;
+                fetch(url, { mode: 'cors' })
+                    .then(function (res) {
+                        if (!res.ok) throw new Error('fetch failed');
+                        return res.blob();
+                    })
+                    .then(function (blob) {
+                        const blobUrl = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = blobUrl;
+                        a.download = filename;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        setTimeout(function () { URL.revokeObjectURL(blobUrl); }, 4000);
+                        btn.innerHTML = '<i class="fas fa-check"></i> Terunduh';
+                        setTimeout(function () { btn.innerHTML = originalHTML; btn.disabled = false; }, 1800);
+                    })
+                    .catch(function () {
+                        window.open(url, '_blank');
+                        btn.innerHTML = originalHTML;
+                        btn.disabled = false;
+                    });
+            }
+
+            modal.querySelectorAll('.donasi-download-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const url = btn.getAttribute('data-download-url');
+                    const filename = btn.getAttribute('data-download-name') || 'qr.jpg';
+                    downloadImage(url, filename, btn);
+                });
+            });
+        })();
+
+        /* CONTROL LOGIKA DROPDOWN SLIDE DOWN & TOGGLE */
+        let selectedMethodFilter = "";
+        const dropdownContainer = document.getElementById('customDropdown');
+        const dropdownToggleBtn = document.getElementById('dropdownToggleBtn');
+        const dropdownCurrentLabel = document.getElementById('dropdownCurrentLabel');
+        const dropdownOptions = document.querySelectorAll('.custom-dropdown-option');
+
+        dropdownToggleBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            dropdownContainer.classList.toggle('is-open');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!dropdownContainer.contains(e.target)) {
+                dropdownContainer.classList.remove('is-open');
+            }
+        });
+
+        dropdownOptions.forEach(function (option) {
+            option.addEventListener('click', function () {
+                selectedMethodFilter = option.getAttribute('data-value');
+                dropdownCurrentLabel.textContent = option.children[0].textContent;
+                
+                dropdownOptions.forEach(o => o.classList.remove('is-selected'));
+                option.classList.add('is-selected');
+
+                dropdownContainer.classList.remove('is-open');
+                renderList();
+            });
+        });
+
+        let allCategories = [];
+        let activeCategory = 'all';
+        const base = window.location.origin;
+        document.getElementById('baseUrl').textContent = base;
+
+        const categoryIcons = {
+            'Information': 'fas fa-circle-info',
+            'Maker': 'fas fa-wand-magic-sparkles',
+            'Bypass': 'fas fa-bolt',
+            'Premium': 'fas fa-crown',
+            'Downloader': 'fas fa-download',
+            'Imagecreator': 'fas fa-image',
+            'AI': 'fas fa-robot',
+            'Artificial Intelligence': 'fas fa-robot',
+            'Random': 'fas fa-shuffle',
+            'Search': 'fas fa-magnifying-glass',
+            'Stalker': 'fas fa-user-secret',
+            'Tools': 'fas fa-screwdriver-wrench',
+            'Orderkuota': 'fas fa-sim-card',
+            'AI Tools': 'fas fa-brain',
+            'Entertainment': 'fas fa-gamepad',
+            'Utilities': 'fas fa-gears',
+            'Social Media': 'fas fa-share-nodes',
+            'Canvas': 'fas fa-palette'
+        };
+
+        const getCategoryIcon = (catName) => {
+            return categoryIcons[catName] || 'fas fa-folder';
+        };
+
+        const methodClass = (m) => {
+            const u = (m || 'GET').toUpperCase();
+            if (u === 'POST') return 'method-post';
+            if (u === 'PUT') return 'method-put';
+            if (u === 'DELETE') return 'method-delete';
+            return 'method-get';
+        };
+
+        const fallbackData = [
+            {
+                name: "Downloader",
+                items: [
+                    { name: "AIO Downloader", method: "GET", path: "/api/download/aio", description: "Download media dari berbagai platform sosial media.", parameters: { url: { type: "string", required: true, example: "https://tiktok.com/..." }, apikey: { type: "string", required: true, example: "mlvn" } } }
+                ]
+            },
+            {
+                name: "Tools",
+                items: [
+                    { name: "Temp Mail", method: "GET", path: "/api/tools/tempmail", description: "Buat email sementara.", parameters: { apikey: { type: "string", required: true, example: "mlvn" } } }
+                ]
+            }
+        ];
+
+        async function loadData() {
+            try {
+                const res = await fetch('/settings');
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const data = await res.json();
+                if (data && data.categories && data.categories.length > 0) {
+                    allCategories = data.categories.map(c => ({
+                        name: c.name,
+                        items: (c.items || []).slice().sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+                    })).sort((a, b) => a.name.localeCompare(b.name));
+                } else {
+                    allCategories = fallbackData;
+                }
+            } catch (e) {
+                allCategories = fallbackData;
+            }
+
+            const totalCats = allCategories.length;
+            const totalEps = allCategories.reduce((acc, cat) => acc + (cat.items ? cat.items.length : 0), 0);
+            
+            const quickCatEl = document.getElementById('quickCatCount');
+            const quickEpEl = document.getElementById('quickEpCount');
+            if (quickCatEl) quickCatEl.textContent = totalCats;
+            if (quickEpEl) quickEpEl.textContent = totalEps;
+
+            renderPills();
+            renderSidebar();
+            renderList();
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('content').classList.remove('hidden');
+        }
+
+        function renderPills() {
+            const el = document.getElementById('catPills');
+            el.innerHTML = `<button class="cat-pill active" data-cat="all"><i class="fas fa-layer-group"></i> Semua</button>` +
+                allCategories.map(c =>
+                    `<button class="cat-pill" data-cat="${escapeAttr(c.name)}"><i class="${getCategoryIcon(c.name)}"></i> ${escapeHtml(c.name)}</button>`
+                ).join('');
+            el.querySelectorAll('.cat-pill').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    activeCategory = btn.dataset.cat;
+                    el.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderList();
+                });
+            });
+        }
+
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            nav.innerHTML = `<a href="#top" class="sidebar-link active" data-cat="all"><i class="fas fa-layer-group"></i> Semua Endpoint</a>` +
+                allCategories.map(c =>
+                    `<a href="#cat-${slug(c.name)}" class="sidebar-link" data-cat="${escapeAttr(c.name)}"><i class="${getCategoryIcon(c.name)}"></i> ${escapeHtml(c.name)} <span class="opacity-70 text-xs ml-auto">(${c.items.length})</span></a>`
+                ).join('');
+            nav.querySelectorAll('.sidebar-link').forEach(a => {
+                a.addEventListener('click', (e) => {
+                    const cat = a.dataset.cat;
+                    activeCategory = cat;
+                    document.querySelectorAll('.cat-pill').forEach(b => {
+                        b.classList.toggle('active', b.dataset.cat === cat);
+                    });
+                    renderList();
+                });
+            });
+        }
+
+        function getFiltered() {
+            const q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const method = selectedMethodFilter;
+            return allCategories.map(cat => {
+                if (activeCategory !== 'all' && cat.name !== activeCategory) return null;
+                let items = cat.items;
+                if (method) items = items.filter(i => (i.method || 'GET').toUpperCase() === method);
+                if (q) {
+                    items = items.filter(i =>
+                        (i.name || '').toLowerCase().includes(q) ||
+                        (i.path || '').toLowerCase().includes(q) ||
+                        (i.description || '').toLowerCase().includes(q) ||
+                        cat.name.toLowerCase().includes(q)
+                    );
+                }
+                if (!items.length) return null;
+                return { ...cat, items };
+            }).filter(Boolean);
+        }
+
+        function renderList() {
+            const filtered = getFiltered();
+            const list = document.getElementById('endpointList');
+            const empty = document.getElementById('emptyState');
+            if (!filtered.length) {
+                list.innerHTML = '';
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+            list.innerHTML = filtered.map(cat => {
+                const rows = cat.items.map((item, idx) => {
+                    const method = (item.method || 'GET').toUpperCase();
+                    const params = item.parameters || {};
+                    const paramKeys = Object.keys(params);
+                    const paramHtml = paramKeys.length
+                        ? paramKeys.map(k => {
+                            const p = params[k] || {};
+                            const req = p.required !== false;
+                            return `<span class="param-chip ${req ? 'required' : ''}" title="${escapeAttr(p.type || 'string')}${p.example ? ' · contoh: ' + p.example : ''}">${escapeHtml(k)}${req ? ' *' : ''}</span>`;
+                        }).join(' ')
+                        : '<span class="text-xs text-gray-600 font-bold">tanpa parameter</span>';
+
+                    const exampleQs = paramKeys
+                        .map(k => {
+                            const p = params[k] || {};
+                            const ex = p.example || (k === 'apikey' ? 'mlvn' : `{${k}}`);
+                            return `${encodeURIComponent(k)}=${encodeURIComponent(ex)}`;
+                        })
+                        .join('&');
+                    const exampleUrl = base + (item.path || '') + (exampleQs ? '?' + exampleQs : '');
+
+                    const id = `ep-${slug(cat.name)}-${idx}`;
+                    return `
+                    <div class="endpoint-row mb-4" id="${id}">
+                        <button type="button" class="w-full text-left px-4 py-3.5 flex items-start gap-3 toggle-ep cursor-pointer" data-target="${id}">
+                            <span class="method-badge ${methodClass(method)} shrink-0 mt-0.5">${method}</span>
+                            <div class="min-w-0 flex-1">
+                                <div class="font-extrabold text-sm sm:text-base text-black truncate">${escapeHtml(item.name || 'Unnamed')}</div>
+                                <div class="font-mono text-[11px] sm:text-xs text-gray-700 font-bold truncate mt-0.5">${escapeHtml(item.path || '')}</div>
+                            </div>
+                            <i class="fas fa-chevron-down text-sm mt-2 text-black chevron transition-transform duration-300"></i>
+                        </button>
+                        <div class="ep-detail-wrap">
+                            <div class="p-4 border-t-3 border-black bg-[var(--nb-bg)] rounded-b-xl">
+                                <p class="text-sm text-gray-900 font-semibold mb-3">${escapeHtml(item.description || 'Tidak ada deskripsi')}</p>
+                                <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Parameter</p>
+                                <div class="flex flex-wrap gap-1.5 mb-4">${paramHtml}</div>
+                                <p class="text-xs font-extrabold uppercase tracking-wider text-black mb-1.5">Contoh Request URL</p>
+                                <code class="block font-mono text-[11px] sm:text-xs bg-white text-black p-3 rounded-xl overflow-x-auto break-all border-2 border-black shadow-[2px_2px_0px_#000] font-bold">${escapeHtml(exampleUrl)}</code>
+                                <a href="/docs?focus=${encodeURIComponent(item.path || '')}" class="inline-flex mt-3 nb-btn nb-btn-primary px-3.5 py-1.5 text-xs font-extrabold">
+                                    <i class="fas fa-play mr-1"></i> Uji di Playground
+                                </a>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                return `
+                <section id="cat-${slug(cat.name)}" class="scroll-mt-24 mb-8">
+                    <h2 class="font-display font-extrabold text-xl mb-4 flex items-center gap-2">
+                        <span class="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[var(--nb-yellow)] border-2.5 border-black text-base text-black shadow-[2px_2px_0px_#000]">
+                            <i class="${getCategoryIcon(cat.name)}"></i>
+                        </span>
+                        ${escapeHtml(cat.name)}
+                        <span class="text-sm font-mono font-bold text-gray-700">(${cat.items.length})</span>
+                    </h2>
+                    ${rows}
+                </section>`;
+            }).join('');
+
+            list.querySelectorAll('.toggle-ep').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const row = document.getElementById(btn.dataset.target);
+                    if (!row) return;
+                    const chev = row.querySelector('.chevron');
+                    const open = row.classList.contains('is-open');
+                    
+                    row.classList.toggle('is-open', !open);
+                    if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+                });
+            });
+        }
+
+        function slug(s) {
+            return (s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        }
+        function escapeHtml(t) {
+            const d = document.createElement('div');
+            d.textContent = t || '';
+            return d.innerHTML;
+        }
+        function escapeAttr(t) {
+            return (t || '').replace(/"/g, '&quot;');
+        }
+
+        document.getElementById('searchInput').addEventListener('input', renderList);
+
+        document.addEventListener('DOMContentLoaded', loadData);
+    </script>
+</body>
+</html>
